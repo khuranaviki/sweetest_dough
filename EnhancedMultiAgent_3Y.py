@@ -487,7 +487,7 @@ class EnhancedMultiAgentStockAnalysis3Y:
     def __init__(self, openai_api_key: str):
         self.openai_api_key = openai_api_key
         self.openai_client = OpenAI(api_key=openai_api_key)
-        self.llm = ChatOpenAI(openai_api_key=openai_api_key, model="gpt-4o-mini")
+        self.llm = ChatOpenAI(openai_api_key=openai_api_key, model=os.getenv('OPENAI_MODEL', 'gpt-5'))
         self.technical_agent = EnhancedTechnicalAnalysisAgent(self.llm, openai_api_key)
 
     def analyze_stock(self, ticker: str, company_name: str, sector: str, category: str = "Unknown") -> Dict:

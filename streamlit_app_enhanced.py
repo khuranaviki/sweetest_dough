@@ -146,7 +146,7 @@ class EnhancedStockAnalysisChatApp:
                 return
                 
             self.llm = ChatOpenAI(
-                model="gpt-4o-mini",
+                model=os.getenv('OPENAI_MODEL', 'gpt-5'),
                 temperature=0.7,
                 openai_api_key=api_key
             )

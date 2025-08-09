@@ -497,7 +497,7 @@ class EnhancedTechnicalAnalysisAgent:
             
             # Call OpenAI Vision API
             response = client.chat.completions.create(
-                model="gpt-4o",
+                model=os.getenv('OPENAI_MODEL', 'gpt-5'),
                 messages=[
                     {
                         "role": "user",
@@ -522,7 +522,7 @@ class EnhancedTechnicalAnalysisAgent:
             
             # Log the API call
             cost_tracker.log_api_call(
-                model="gpt-4o",
+                model=os.getenv('OPENAI_MODEL', 'gpt-5'),
                 tokens_used=response.usage.total_tokens,
                 cost_usd=response.usage.total_tokens * 0.003 / 1000,  # gpt-4o pricing
                 description=f"Technical analysis for {stock_data.ticker}"
@@ -952,7 +952,26 @@ Please respond in this exact JSON format:
         ax.plot(df.index, ma_100, label='MA 100', color='purple', linewidth=1, alpha=0.8)
         ax.plot(df.index, ma_200, label='MA 200', color='brown', linewidth=1, alpha=0.8)
         
-        ax.set_title(f'{ticker} - 3-Year Candlestick Chart', fontsize=14, fontweight='bold')
+        # Bollinger Bands
+        bb_std = df['Close'].rolling(window=20).std()
+        bb_upper = ma_20 + (2 * bb_std)
+        bb_lower = ma_20 - (2 * bb_std)
+        ax.fill_between(df.index, bb_upper, bb_lower, alpha=0.08, color='gray', label='Bollinger Bands')
+        
+        # Support, Resistance, and Target lines
+        try:
+            recent = df.tail(120)
+            support_level = float(recent['Low'].rolling(20).min().iloc[-1])
+            resistance_level = float(recent['High'].rolling(20).max().iloc[-1])
+            last_close = float(df['Close'].iloc[-1])
+            target_level = last_close * 1.1
+            ax.axhline(support_level, color='#2E8B57', linestyle='--', linewidth=1.2, label=f'Support ~ {support_level:.2f}')
+            ax.axhline(resistance_level, color='#DC143C', linestyle='--', linewidth=1.2, label=f'Resistance ~ {resistance_level:.2f}')
+            ax.axhline(target_level, color='#1E90FF', linestyle='--', linewidth=1.2, label=f'Target ~ {target_level:.2f}')
+        except Exception:
+            pass
+        
+        ax.set_title(f'{ticker} - 3-Year Candlestick Chart (with S/R + Target)', fontsize=14, fontweight='bold')
         ax.set_ylabel('Price', fontsize=12)
         ax.legend()
         ax.grid(True, alpha=0.3)
@@ -2951,8 +2970,8 @@ class EnhancedMultiAgentStockAnalysis:
     def __init__(self, openai_api_key: str):
         self.openai_api_key = openai_api_key  # Store the API key
         self.openai_client = OpenAI(api_key=openai_api_key)
-        # Use gpt-4o-mini for better cost efficiency and similar quality
-        self.llm = ChatOpenAI(openai_api_key=openai_api_key, model="gpt-4o-mini")
+        # Initialize primary LLM with configurable model
+        self.llm = ChatOpenAI(openai_api_key=openai_api_key, model=DEFAULT_OPENAI_MODEL)
         self.technical_agent = EnhancedTechnicalAnalysisAgent(self.llm, openai_api_key)
         self.fundamental_agent = EnhancedFundamentalAnalysisAgent(self.llm, openai_api_key)
         self.coordinator_agent = EnhancedCoordinatorAgent(self.llm)

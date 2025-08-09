@@ -138,7 +138,7 @@ class OpenAICostTracker:
         """Calculate cost for a given model and token usage"""
         if model not in self.PRICING:
             print(f"⚠️ Unknown model pricing for {model}, using gpt-4o-mini as fallback")
-            model = "gpt-4o-mini"
+            model = os.getenv('OPENAI_MODEL', 'gpt-5')
         
         pricing = self.PRICING[model]
         
