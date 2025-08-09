@@ -1,0 +1,26 @@
+{
+  "trend": "Bullish",
+  "support_levels": [
+    400.0,
+    450.0
+  ],
+  "resistance_levels": [
+    600.0,
+    650.0
+  ],
+  "entry_range": "\u20b9550-\u20b9570",
+  "short_term_target": "\u20b9600",
+  "medium_term_target": "\u20b9650",
+  "stop_loss": "\u20b9540",
+  "confidence_score": "Medium",
+  "indicators": {},
+  "patterns": [
+    "Higher Highs",
+    "Higher Lows"
+  ],
+  "strategy_signals": [
+    "Buy on dips",
+    "Momentum trading"
+  ],
+  "position_sizing": "5% of portfolio"
+}

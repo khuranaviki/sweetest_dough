@@ -1,0 +1,78 @@
+[
+  {
+    "ticker": "DELHIVERY.NS",
+    "company_name": "Delhivery Limited",
+    "sector": "Logistics",
+    "category": "3-Year Analysis Test",
+    "analysis_timestamp": "2025-08-08T20:12:39.409684",
+    "technical_analysis": {
+      "trend": "Bullish",
+      "support_levels": [
+        332.29998779296875,
+        441.41749420166013
+      ],
+      "resistance_levels": [
+        468.0,
+        487.8824935913086
+      ],
+      "entry_range": "455.36 - 473.94",
+      "short_term_target": "487.88",
+      "medium_term_target": "534.35",
+      "stop_loss": "441.42",
+      "confidence_score": "Medium",
+      "indicators": {
+        "RSI": 62.68,
+        "Current_Price": 464.65,
+        "3Y_High": 468.0,
+        "3Y_Low": 332.3
+      },
+      "patterns": [],
+      "strategy_signals": [
+        "3-Year Chart Analysis"
+      ],
+      "position_sizing": "3-5% of portfolio"
+    },
+    "data_points": 742,
+    "timeframe": "3 Years",
+    "analysis_type": "3-Year Chart Priority"
+  },
+  {
+    "ticker": "RELIANCE.NS",
+    "company_name": "Reliance Industries Limited",
+    "sector": "Oil & Gas",
+    "category": "3-Year Analysis Test",
+    "analysis_timestamp": "2025-08-08T20:13:01.314091",
+    "technical_analysis": {
+      "trend": "Bullish",
+      "support_levels": [
+        1365.0,
+        1299.4100463867187
+      ],
+      "resistance_levels": [
+        1551.0,
+        1436.1900512695313
+      ],
+      "entry_range": "1340.44 - 1395.16",
+      "short_term_target": "1436.19",
+      "medium_term_target": "1572.97",
+      "stop_loss": "1299.41",
+      "confidence_score": "Medium",
+      "indicators": {
+        "RSI": 33.85,
+        "Current_Price": 1367.8,
+        "3Y_High": 1551.0,
+        "3Y_Low": 1365.0
+      },
+      "patterns": [
+        "Cup and Handle"
+      ],
+      "strategy_signals": [
+        "3-Year Chart Analysis"
+      ],
+      "position_sizing": "3-5% of portfolio"
+    },
+    "data_points": 742,
+    "timeframe": "3 Years",
+    "analysis_type": "3-Year Chart Priority"
+  }
+]

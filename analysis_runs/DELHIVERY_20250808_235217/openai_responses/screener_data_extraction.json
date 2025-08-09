@@ -1,0 +1,73 @@
+{
+  "quarterly_results": {
+    "revenue": [
+      "1,298",
+      "1,258",
+      "1,028",
+      "1,090",
+      "1,024",
+      "1,038",
+      "1,063",
+      "1,023"
+    ],
+    "net_profit": [
+      "-162",
+      "-148",
+      "-233",
+      "-221",
+      "-189",
+      "-58",
+      "-35",
+      "-19"
+    ],
+    "ebitda": [
+      "-78",
+      "-70",
+      "-88",
+      "-81",
+      "-84",
+      "-61",
+      "-55",
+      "-40"
+    ]
+  },
+  "ratios": {
+    "roe": "22.85%",
+    "roce": "Not Visible",
+    "debt_to_equity": "Not Visible",
+    "current_ratio": "Not Visible",
+    "operating_margin": "Not Visible",
+    "net_margin": "Not Visible"
+  },
+  "valuation": {
+    "market_cap": "6,671",
+    "current_price": "486",
+    "book_value": "154",
+    "pe_ratio": "Not Visible",
+    "pb_ratio": "Not Visible",
+    "ev_ebitda": "Not Visible"
+  },
+  "shareholding": {
+    "promoter_holding": "67.43%",
+    "fii_holding": "24.13%",
+    "dii_holding": "8.04%",
+    "retail_holding": "Not Visible"
+  },
+  "balance_sheet": {
+    "total_assets": "3,193",
+    "total_liabilities": "Not Visible",
+    "net_worth": "1,424",
+    "working_capital": "Not Visible"
+  },
+  "cash_flows": {
+    "operating_cf": "Not Visible",
+    "investing_cf": "Not Visible",
+    "financing_cf": "Not Visible"
+  },
+  "profit_loss": {
+    "total_revenue": "Not Visible",
+    "total_expenses": "Not Visible",
+    "operating_profit": "Not Visible",
+    "net_profit": "Not Visible"
+  }
+}

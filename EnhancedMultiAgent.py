@@ -28,8 +28,9 @@ from selenium.webdriver.support import expected_conditions as EC
 from openai import OpenAI
 from datetime import datetime, timedelta
 from openai_cost_tracker import cost_tracker
-from robust_data_fetcher import RobustDataFetcher
+# from robust_data_fetcher import RobustDataFetcher
 import numpy as np
+import shutil
 
 # Import our fundamental scraper
 from fundamental_scraper import FundamentalDataCollector, FundamentalData
@@ -97,7 +98,7 @@ class EnhancedTechnicalAnalysisAgent:
         self.charts_dir = "technical_charts"
         os.makedirs(self.charts_dir, exist_ok=True)
     
-    def analyze(self, stock_data: StockData) -> EnhancedTechnicalAnalysis:
+    def analyze(self, stock_data: StockData, existing_chart_path: str = None) -> EnhancedTechnicalAnalysis:
         print(f"📈 Enhanced Technical Analysis Agent analyzing {stock_data.ticker}...")
         
         # Check if we have OHLCV data
@@ -109,7 +110,13 @@ class EnhancedTechnicalAnalysisAgent:
             cwh_analysis = self._identify_cwh_pattern(stock_data)
             
             # Try comprehensive analysis with chart
-            chart_base64 = self._create_candlestick_chart(stock_data)
+            if existing_chart_path and os.path.exists(existing_chart_path):
+                print(f"📊 Using existing chart for analysis: {existing_chart_path}")
+                chart_base64 = self._get_chart_base64_from_path(existing_chart_path)
+            else:
+                print(f"📊 No existing chart available, skipping chart analysis to preserve colors...")
+                chart_base64 = None
+            
             if chart_base64:
                 print("✅ Technical Analysis: Using chart image for analysis")
                 return self._analyze_with_chart_and_data(stock_data, chart_base64, rhs_analysis, cwh_analysis)
@@ -585,16 +592,22 @@ class EnhancedTechnicalAnalysisAgent:
             print(f"❌ Error in OpenAI comprehensive analysis for {stock_data.ticker}: {str(e)}")
             return None
     
-    def _get_openai_chart_analysis(self, stock_data: StockData) -> Optional[EnhancedTechnicalAnalysis]:
+    def _get_openai_chart_analysis(self, stock_data: StockData, existing_chart_path: str = None) -> Optional[EnhancedTechnicalAnalysis]:
         """Use OpenAI vision model to analyze candlestick chart image"""
         try:
             import base64
             
-            # Generate candlestick chart first
-            chart_base64 = self._create_candlestick_chart(stock_data)
+            # Use existing chart if provided, otherwise skip chart analysis to preserve colors
+            if existing_chart_path and os.path.exists(existing_chart_path):
+                print(f"📊 Using existing candlestick chart: {existing_chart_path}")
+                with open(existing_chart_path, 'rb') as f:
+                    chart_base64 = base64.b64encode(f.read()).decode('utf-8')
+            else:
+                print(f"📊 No existing chart available, skipping chart analysis to preserve colors...")
+                return None
             
             if not chart_base64:
-                print("❌ Failed to generate candlestick chart for analysis")
+                print("❌ Failed to read existing candlestick chart for analysis")
                 return None
             
             # Create prompt for chart analysis
@@ -862,8 +875,18 @@ Please respond in this exact JSON format:
             # Get the data
             df = stock_data.ohlcv_data.copy()
             
+            # Set matplotlib backend for better color support
+            import matplotlib
+            matplotlib.use('Agg')  # Use Agg backend for better color support
+            # Ensure default style and white backgrounds
+            import matplotlib.pyplot as plt
+            plt.style.use('default')
+            
             # Create figure and axis
             fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 8), gridspec_kw={'height_ratios': [3, 1]})
+            fig.patch.set_facecolor('white')
+            ax1.set_facecolor('white')
+            ax2.set_facecolor('white')
             
             # Plot candlestick chart
             self._plot_candlesticks(ax1, df, stock_data.ticker)
@@ -873,14 +896,14 @@ Please respond in this exact JSON format:
             
             # Add title and labels
             fig.suptitle(f'{stock_data.ticker} ({stock_data.company_name}) - Technical Analysis Chart', 
-                        fontsize=16, fontweight='bold')
+                        fontsize=16, fontweight='bold', color='black')
             
             # Adjust layout
             plt.tight_layout()
             
             # Convert to base64
             buffer = BytesIO()
-            plt.savefig(buffer, format='png', dpi=300, bbox_inches='tight')
+            plt.savefig(buffer, format='png', dpi=300, bbox_inches='tight', facecolor='white', transparent=False)
             buffer.seek(0)
             chart_base64 = base64.b64encode(buffer.getvalue()).decode('utf-8')
             plt.close()
@@ -897,61 +920,65 @@ Please respond in this exact JSON format:
         # Calculate moving averages
         ma_20 = df['Close'].rolling(window=20).mean()
         ma_50 = df['Close'].rolling(window=50).mean()
+        ma_100 = df['Close'].rolling(window=100).mean()
         ma_200 = df['Close'].rolling(window=200).mean()
         
-        # Plot candlesticks
+        # Plot candlesticks with enhanced colors
         for i in range(len(df)):
             date = df.index[i]
-            open_price = df['Open'].iloc[i]
-            high_price = df['High'].iloc[i]
-            low_price = df['Low'].iloc[i]
-            close_price = df['Close'].iloc[i]
+            open_price = float(df['Open'].iloc[i])
+            high_price = float(df['High'].iloc[i])
+            low_price = float(df['Low'].iloc[i])
+            close_price = float(df['Close'].iloc[i])
             
-            # Determine color
-            color = 'green' if close_price >= open_price else 'red'
+            # Determine color - GREEN for bullish, RED for bearish
+            color = '#2E8B57' if close_price >= open_price else '#DC143C'  # Sea Green for bullish, Crimson for bearish
             
             # Plot body
-            ax.bar(date, close_price - open_price, bottom=open_price, 
-                   color=color, alpha=0.7, width=0.8)
+            body_height = abs(close_price - open_price)
+            body_bottom = min(open_price, close_price)
             
-            # Plot wicks
-            ax.plot([date, date], [low_price, high_price], color='black', linewidth=1)
+            if body_height > 0:
+                ax.bar(date, body_height, bottom=body_bottom, color=color, alpha=0.85, width=0.7)
+            else:
+                ax.plot([date, date], [open_price - 0.1, open_price + 0.1], color=color, alpha=0.5, linewidth=0.6)
+            
+            # Plot wicks using candle color with low alpha (avoid black)
+            ax.plot([date, date], [low_price, high_price], color=color, alpha=0.35, linewidth=0.6)
         
-        # Plot moving averages
-        ax.plot(df.index, ma_20, label='MA 20', color='blue', linewidth=1.5, alpha=0.8)
-        ax.plot(df.index, ma_50, label='MA 50', color='orange', linewidth=1.5, alpha=0.8)
-        ax.plot(df.index, ma_200, label='MA 200', color='red', linewidth=1.5, alpha=0.8)
+        # Add moving averages
+        ax.plot(df.index, ma_20, label='MA 20', color='blue', linewidth=1, alpha=0.8)
+        ax.plot(df.index, ma_50, label='MA 50', color='orange', linewidth=1, alpha=0.8)
+        ax.plot(df.index, ma_100, label='MA 100', color='purple', linewidth=1, alpha=0.8)
+        ax.plot(df.index, ma_200, label='MA 200', color='brown', linewidth=1, alpha=0.8)
         
-        # Add Bollinger Bands
-        bb_upper = ma_20 + (2 * df['Close'].rolling(window=20).std())
-        bb_lower = ma_20 - (2 * df['Close'].rolling(window=20).std())
-        ax.fill_between(df.index, bb_upper, bb_lower, alpha=0.1, color='gray', label='Bollinger Bands')
-        
-        # Formatting
-        ax.set_title(f'{ticker} - Price Chart with Technical Indicators', fontsize=12, fontweight='bold')
-        ax.set_ylabel('Price (₹)', fontsize=10)
-        ax.legend(loc='upper left')
+        ax.set_title(f'{ticker} - 3-Year Candlestick Chart', fontsize=14, fontweight='bold')
+        ax.set_ylabel('Price', fontsize=12)
+        ax.legend()
         ax.grid(True, alpha=0.3)
         
         # Format x-axis
         ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m'))
-        ax.xaxis.set_major_locator(mdates.MonthLocator(interval=3))
+        ax.xaxis.set_major_locator(mdates.MonthLocator(interval=6))
         plt.setp(ax.xaxis.get_majorticklabels(), rotation=45)
     
     def _plot_volume(self, ax, df: pd.DataFrame):
         """Plot volume bars"""
-        colors = ['green' if close >= open else 'red' 
-                 for close, open in zip(df['Close'], df['Open'])]
+        volume_colors = []
+        for i in range(len(df)):
+            close_price = float(df['Close'].iloc[i])
+            open_price = float(df['Open'].iloc[i])
+            volume_colors.append('#2E8B57' if close_price >= open_price else '#DC143C')  # Sea Green for bullish, Crimson for bearish
         
-        ax.bar(df.index, df['Volume'], color=colors, alpha=0.7, width=0.8)
-        ax.set_title('Volume', fontsize=10, fontweight='bold')
-        ax.set_ylabel('Volume', fontsize=10)
-        ax.grid(True, alpha=0.3)
+        ax.bar(df.index, df['Volume'], color=volume_colors, alpha=0.55, width=0.8)
+        ax.set_title('Volume Analysis (3-Year)', fontsize=12, fontweight='bold', color='black')
+        ax.set_ylabel('Volume', fontsize=10, color='black')
+        ax.grid(True, alpha=0.25, color='#888888')
         
-        # Format x-axis
+        # Format x-axis for volume
         ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m'))
-        ax.xaxis.set_major_locator(mdates.MonthLocator(interval=3))
-        plt.setp(ax.xaxis.get_majorticklabels(), rotation=45)
+        ax.xaxis.set_major_locator(mdates.MonthLocator(interval=6))
+        plt.setp(ax.xaxis.get_majorticklabels(), rotation=45, color='black')
 
     def _identify_rhs_pattern(self, stock_data: StockData) -> Dict:
         """Identify Reverse Head and Shoulder (RHS) patterns from candlestick data"""
@@ -3094,7 +3121,7 @@ class EnhancedMultiAgentStockAnalysis:
             for ticker_format in ticker_formats:
                 try:
                     print(f"🔄 Attempt {attempt + 1}: Trying {ticker_format}...")
-                    data = yf.download(ticker_format, period="6mo", interval="1d", progress=False, auto_adjust=True)
+                    data = yf.download(ticker_format, period="3y", interval="1d", progress=False, auto_adjust=True)
                     
                     if data is not None and len(data) > 0:
                         print(f"✅ Successfully fetched data for {ticker_format}")
@@ -3554,13 +3581,15 @@ Generated on: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
         # Calculate moving averages
         ma_20 = data['Close'].rolling(window=20).mean()
         ma_50 = data['Close'].rolling(window=50).mean()
+        ma_100 = data['Close'].rolling(window=100).mean()
         ma_200 = data['Close'].rolling(window=200).mean()
         
         for i in range(200, len(data) - 20):
             # Golden Cross signal
             if (ma_20.iloc[i] > ma_50.iloc[i] and 
                 ma_20.iloc[i-1] <= ma_50.iloc[i-1] and
-                ma_50.iloc[i] > ma_200.iloc[i]):
+                ma_50.iloc[i] > ma_100.iloc[i] and
+                ma_100.iloc[i] > ma_200.iloc[i]):
                 
                 entry_price = data['Close'].iloc[i]
                 entry_date = data.index[i]
@@ -4248,7 +4277,8 @@ The analysis provides a holistic view of {ticker} considering both quantitative 
             # Moving averages
             ma_20 = df['Close'].rolling(window=20).mean().iloc[-1]
             ma_50 = df['Close'].rolling(window=50).mean().iloc[-1]
-            ma_200 = df['Close'].rolling(window=200).mean().iloc[-1]
+            ma_100 = df['Close'].rolling(window=100).mean()
+            ma_200 = df['Close'].rolling(window=200).mean()
             
             # RSI
             delta = df['Close'].diff()
@@ -4295,6 +4325,7 @@ The analysis provides a holistic view of {ticker} considering both quantitative 
                     "RSI": round(float(current_rsi), 2) if not pd.isna(current_rsi) else 0.0,
                     "MA_20": round(float(ma_20), 2) if not pd.isna(ma_20) else 0.0,
                     "MA_50": round(float(ma_50), 2) if not pd.isna(ma_50) else 0.0,
+                    "MA_100": round(float(ma_100), 2) if not pd.isna(ma_100) else 0.0,
                     "MA_200": round(float(ma_200), 2) if not pd.isna(ma_200) else 0.0,
                     "Volume_Ratio": round(float(current_volume/volume_avg), 2) if volume_avg > 0 else 0.0
                 },
@@ -4826,7 +4857,7 @@ The analysis provides a holistic view of {ticker} considering both quantitative 
                 )
                 
                 # Use the technical agent's analysis with the collected chart
-                analysis = self.technical_agent._get_openai_chart_analysis(temp_stock_data)
+                analysis = self.technical_agent._get_openai_chart_analysis(temp_stock_data, collected_data.get('candlestick_chart'))
                 
                 # Save OpenAI response if available
                 if analysis and collected_data.get('openai_responses_directory'):
@@ -4838,7 +4869,7 @@ The analysis provides a holistic view of {ticker} considering both quantitative 
                 return analysis
             else:
                 print(f"📊 No candlestick chart available, using OHLCV data analysis...")
-                analysis = self.technical_agent.analyze(stock_data)
+                analysis = self.technical_agent.analyze(stock_data, collected_data.get('candlestick_chart'))
                 
                 # Save OpenAI response if available
                 if analysis and collected_data.get('openai_responses_directory'):
@@ -4851,7 +4882,7 @@ The analysis provides a holistic view of {ticker} considering both quantitative 
                 
         except Exception as e:
             print(f"❌ Error in technical analysis with collected data: {e}")
-            return self.technical_agent.analyze(stock_data)  # Fallback to original method
+            return self.technical_agent.analyze(stock_data, collected_data.get('candlestick_chart'))  # Fallback to original method
 
     def _perform_fundamental_analysis_with_collected_data(self, stock_data: StockData, collected_data: Dict) -> EnhancedFundamentalAnalysis:
         """Perform fundamental analysis using pre-collected data"""
@@ -5230,6 +5261,16 @@ The analysis provides a holistic view of {ticker} considering both quantitative 
                 return "Medium"
         except:
             return "Medium"
+
+    def _get_chart_base64_from_path(self, chart_path: str) -> Optional[str]:
+        """Get base64 encoded chart from existing file path"""
+        try:
+            import base64
+            with open(chart_path, 'rb') as f:
+                return base64.b64encode(f.read()).decode('utf-8')
+        except Exception as e:
+            print(f"❌ Error reading chart from path {chart_path}: {e}")
+            return None
 
 # Custom JSON encoder to handle pandas Timestamp objects
 class CustomJSONEncoder(json.JSONEncoder):

@@ -1,0 +1,73 @@
+{
+  "quarterly_results": {
+    "revenue": [
+      "1,114",
+      "1,136",
+      "1,218",
+      "1,388",
+      "1,200",
+      "1,280",
+      "1,300",
+      "1,400"
+    ],
+    "net_profit": [
+      "-80",
+      "-131",
+      "-94",
+      "-38",
+      "-60",
+      "-30",
+      "10",
+      "20"
+    ],
+    "ebitda": [
+      "60",
+      "80",
+      "100",
+      "120",
+      "110",
+      "90",
+      "85",
+      "95"
+    ]
+  },
+  "ratios": {
+    "roe": "22.6%",
+    "roce": "15.8%",
+    "debt_to_equity": "0.4",
+    "current_ratio": "1.2",
+    "operating_margin": "5.0%",
+    "net_margin": "-2.5%"
+  },
+  "valuation": {
+    "market_cap": "12,000",
+    "current_price": "486",
+    "book_value": "150",
+    "pe_ratio": "-15.5",
+    "pb_ratio": "3.2",
+    "ev_ebitda": "7.8"
+  },
+  "shareholding": {
+    "promoter_holding": "40%",
+    "fii_holding": "25%",
+    "dii_holding": "15%",
+    "retail_holding": "20%"
+  },
+  "balance_sheet": {
+    "total_assets": "3,200",
+    "total_liabilities": "1,800",
+    "net_worth": "1,400",
+    "working_capital": "500"
+  },
+  "cash_flows": {
+    "operating_cf": "200",
+    "investing_cf": "-100",
+    "financing_cf": "-50"
+  },
+  "profit_loss": {
+    "total_revenue": "1,200",
+    "total_expenses": "1,280",
+    "operating_profit": "100",
+    "net_profit": "-60"
+  }
+}

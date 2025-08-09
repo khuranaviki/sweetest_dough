@@ -1,0 +1,60 @@
+{
+  "ticker": "DELHIVERY.NS",
+  "company_name": "Delhivery",
+  "sector": "Technology",
+  "category": "V40 Next",
+  "analysis_timestamp": "2025-08-07T14:13:47.452146",
+  "technical_analysis": {
+    "trend": "Bullish",
+    "support_levels": [
+      350.0,
+      300.0
+    ],
+    "resistance_levels": [
+      450.0,
+      400.0
+    ],
+    "entry_range": "\u20b9400-\u20b9420",
+    "short_term_target": "\u20b9450",
+    "medium_term_target": "\u20b9480",
+    "stop_loss": "\u20b9390",
+    "confidence_score": "Medium",
+    "indicators": {},
+    "patterns": [
+      "Ascending Triangle"
+    ],
+    "strategy_signals": [
+      "Buy on breakout",
+      "Use trailing stop"
+    ],
+    "position_sizing": "5% of portfolio"
+  },
+  "fundamental_analysis": {
+    "business_quality": "Strong",
+    "market_penetration": "Not Available",
+    "pricing_power": "Not Available",
+    "revenue_growth": "\u20b91,091 Cr \u2192 \u20b91,542 Cr",
+    "profit_growth": "\u20b922 Cr \u2192 \u20b94 Cr",
+    "debt_to_equity": "0.2 \u2192 Best",
+    "roce_roe": "7.9% \u2192 Poor",
+    "promoter_pledging": "60% \u00d7 0% = 0 \u2192 OK",
+    "retail_shareholding": "9.1% \u2192 Acceptable",
+    "valuation_status": "Brand Premium",
+    "fair_value": "Not Available",
+    "financial_health": "Fair",
+    "multibagger_potential": "Not Available",
+    "fundamental_reasons": "Strong promoter holding; Low debt-to-equity ratio; Positive cash flow from operations; ROCE: 7.9% \u2192 Poor; Debt/Equity: 0.2 \u2192 Best; Valuation: Brand Premium; Management guidance aligns with growth trends; Strategic initiatives supported by fundamentals",
+    "confidence_score": "Strong"
+  },
+  "strategy_analysis": {
+    "strategy_performance": {
+      "CWH Strategy": {
+        "total_signals": 14,
+        "successful_signals": 14,
+        "success_rate": 100.0,
+        "avg_gain": 52.83467994545991,
+        "avg_loss": 0,
+        "avg_hold_days": 58.642857142857146,
+        "best_signal": {
+          "entry_price": 238.5,
+          "entry_date": 

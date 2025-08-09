@@ -1,0 +1,26 @@
+{
+  "trend": "Sideways",
+  "support_levels": [
+    80.0,
+    75.0
+  ],
+  "resistance_levels": [
+    95.0,
+    100.0
+  ],
+  "entry_range": "\u20b985-\u20b990",
+  "short_term_target": "\u20b995",
+  "medium_term_target": "\u20b9105",
+  "stop_loss": "\u20b978",
+  "confidence_score": "Medium",
+  "indicators": {},
+  "patterns": [
+    "Double Bottom",
+    "Head and Shoulders"
+  ],
+  "strategy_signals": [
+    "Buy on dips",
+    "Breakout trading"
+  ],
+  "position_sizing": "5% of portfolio"
+}

@@ -1,0 +1,80 @@
+
+================================================================================
+💰 DELHIVERY ANALYSIS COST REPORT
+================================================================================
+
+📊 ANALYSIS DETAILS:
+Ticker: DELHIVERY
+Company: DELHIVERY LTD
+Analysis Date: 2025-08-09 11:30:47
+
+================================================================================
+📈 TODAY'S API USAGE SUMMARY
+==================================================
+Total API Calls: 3
+Total Tokens: 9,358
+  • Input Tokens: 6,327
+  • Output Tokens: 3,031
+Total Cost: $0.002768 (₹0.23)
+
+BREAKDOWN BY MODEL:
+  • gpt-4o-mini: 3 calls, $0.002768
+
+================================================================================
+📊 WEEKLY USAGE SUMMARY (Last 7 Days)
+==================================================
+Total Calls: 135
+Total Tokens: 366,001
+Total Cost: $0.490203 (₹40.67)
+
+BREAKDOWN BY MODEL:
+  • gpt-4o:
+    - Calls: 37
+    - Tokens: 97,034
+    - Cost: $0.419428 (₹34.81)
+  • gpt-4o-mini:
+    - Calls: 98
+    - Tokens: 268,967
+    - Cost: $0.070775 (₹5.86)
+
+================================================================================
+📅 DAILY BREAKDOWN (Last 5 Days)
+==================================================
+  2025-08-05: 50 calls, 165,027 tokens, $0.370621 (₹30.74)
+  2025-08-06: 13 calls, 26,040 tokens, $0.071444 (₹5.93)
+  2025-08-07: 18 calls, 35,413 tokens, $0.009770 (₹0.81)
+  2025-08-08: 51 calls, 130,163 tokens, $0.035600 (₹2.96)
+  2025-08-09: 3 calls, 9,358 tokens, $0.002768 (₹0.23)
+
+================================================================================
+💰 COST ESTIMATIONS FOR DIFFERENT SCENARIOS
+==================================================
+  • 1 stocks: $0.052000 (₹4.32)
+    - Total tokens: 13,000
+    - Tokens per stock: 13,000
+  • 5 stocks: $0.260000 (₹21.58)
+    - Total tokens: 65,000
+    - Tokens per stock: 13,000
+  • 10 stocks: $0.520000 (₹43.16)
+    - Total tokens: 130,000
+    - Tokens per stock: 13,000
+  • 20 stocks: $1.040000 (₹86.32)
+    - Total tokens: 260,000
+    - Tokens per stock: 13,000
+  • 50 stocks: $2.600000 (₹215.80)
+    - Total tokens: 650,000
+    - Tokens per stock: 13,000
+  • 100 stocks: $5.200000 (₹431.60)
+    - Total tokens: 1,300,000
+    - Tokens per stock: 13,000
+
+================================================================================
+📋 COST OPTIMIZATION RECOMMENDATIONS
+==================================================
+1. Use GPT-4o-mini for basic analysis to reduce costs
+2. Batch process multiple stocks to optimize API calls
+3. Cache fundamental data to avoid repeated extractions
+4. Use local analysis for simple technical indicators
+5. Monitor usage regularly to stay within budget
+
+================================================================================

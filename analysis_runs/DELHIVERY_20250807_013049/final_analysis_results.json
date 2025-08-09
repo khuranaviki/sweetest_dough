@@ -1,0 +1,60 @@
+{
+  "ticker": "DELHIVERY.NS",
+  "company_name": "Delhivery",
+  "sector": "Technology",
+  "category": "V40 Next",
+  "analysis_timestamp": "2025-08-07T01:56:40.279163",
+  "technical_analysis": {
+    "trend": "Bullish",
+    "support_levels": [
+      300.0,
+      275.0
+    ],
+    "resistance_levels": [
+      450.0,
+      400.0
+    ],
+    "entry_range": "\u20b9350-\u20b9360",
+    "short_term_target": "\u20b9400",
+    "medium_term_target": "\u20b9450",
+    "stop_loss": "\u20b9320",
+    "confidence_score": "Medium",
+    "indicators": {},
+    "patterns": [
+      "Ascending Triangle"
+    ],
+    "strategy_signals": [
+      "Buy on dips",
+      "Momentum trading"
+    ],
+    "position_sizing": "5% of portfolio"
+  },
+  "fundamental_analysis": {
+    "business_quality": "Medium",
+    "market_penetration": "Not Available",
+    "pricing_power": "Not Available",
+    "revenue_growth": "\u20b91,301 Cr \u2192 \u20b91,267 Cr",
+    "profit_growth": "\u20b9-25 Cr \u2192 \u20b9-18 Cr",
+    "debt_to_equity": "Not Visible \u2192 High Risk",
+    "roce_roe": "Not Visible \u2192 Poor",
+    "promoter_pledging": "66.74% \u00d7 Not Visible = Not Applicable \u2192 OK",
+    "retail_shareholding": "24.22% \u2192 Acceptable",
+    "valuation_status": "Undervalued",
+    "fair_value": "Not Available",
+    "financial_health": "Fair",
+    "multibagger_potential": "Not Available",
+    "fundamental_reasons": "Strong promoter holding; Potential for future growth; ROCE: Not Visible \u2192 Poor; Debt/Equity: Not Visible \u2192 High Risk; Valuation: Undervalued; Management guidance aligns with growth trends; Strategic initiatives supported by fundamentals",
+    "confidence_score": "Medium"
+  },
+  "strategy_analysis": {
+    "strategy_performance": {
+      "CWH Strategy": {
+        "total_signals": 15,
+        "successful_signals": 15,
+        "success_rate": 100.0,
+        "avg_gain": 52.779872848969255,
+        "avg_loss": 0,
+        "avg_hold_days": 58.0,
+        "best_signal": {
+          "entry_price": 238.5,
+          "entry_date": 

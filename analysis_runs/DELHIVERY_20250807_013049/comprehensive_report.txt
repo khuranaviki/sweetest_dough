@@ -1,0 +1,124 @@
+
+====================================================================================================
+COMPREHENSIVE STOCK ANALYSIS REPORT
+====================================================================================================
+
+📊 STOCK INFORMATION
+==================================================
+Ticker: DELHIVERY.NS
+Company: Delhivery
+Sector: Technology
+Category: V40 Next
+Analysis Date: 2025-08-07 01:56:40
+
+====================================================================================================
+📈 TECHNICAL ANALYSIS
+==================================================
+Trend: Bullish
+Support Levels: [300.0, 275.0]
+Resistance Levels: [450.0, 400.0]
+Entry Range: ₹350-₹360
+Short-term Target: ₹400
+Medium-term Target: ₹450
+Stop Loss: ₹320
+Confidence Score: Medium
+
+Technical Indicators:
+Not Available
+
+Chart Patterns Identified:
+  • Ascending Triangle
+
+Strategy Signals:
+  • Buy on dips
+  • Momentum trading
+
+====================================================================================================
+💰 FUNDAMENTAL ANALYSIS
+==================================================
+Business Quality: Medium
+Market Penetration: Not Available
+Pricing Power: Not Available
+Revenue Growth: ₹1,301 Cr → ₹1,267 Cr
+Profit Growth: ₹-25 Cr → ₹-18 Cr
+Debt to Equity: Not Visible → High Risk
+ROCE/ROE: Not Visible → Poor
+Promoter Pledging: 66.74% × Not Visible = Not Applicable → OK
+Retail Shareholding: 24.22% → Acceptable
+Valuation Status: Undervalued
+Fair Value: Not Available
+Financial Health: Fair
+Multibagger Potential: Not Available
+Confidence Score: Medium
+
+Fundamental Reasons for Buy Signal:
+Strong promoter holding; Potential for future growth; ROCE: Not Visible → Poor; Debt/Equity: Not Visible → High Risk; Valuation: Undervalued; Management guidance aligns with growth trends; Strategic initiatives supported by fundamentals
+
+====================================================================================================
+📊 STRATEGY PERFORMANCE ANALYSIS
+==================================================
+
+STRATEGY PERFORMANCE ANALYSIS (2-Year Historical Data):
+
+RECOMMENDED STRATEGY: CWH Strategy
+
+PERFORMANCE METRICS:
+- Total Signals: 15
+- Success Rate: 100.0%
+- Average Gain: 52.8%
+- Average Loss: 0.0%
+- Average Hold Days: 58 days
+
+BEST HISTORICAL SIGNAL:
+- Entry: ₹238.50 on 2025-04-07
+- Exit: ₹371.85 on 2025-06-09
+- Gain: 55.9%
+
+CURRENT STRATEGY SIGNALS: None
+
+ALL STRATEGY PERFORMANCE RANKING:
+1. CWH Strategy: 100.0% success rate (15 signals)
+2. V20 Strategy: 100.0% success rate (41 signals)
+3. RSI Strategy: 100.0% success rate (4 signals)
+
+
+====================================================================================================
+🎯 FINAL RECOMMENDATION
+==================================================
+Action: BUY
+Entry Price: ₹350-₹360
+Target Price: ₹534.73
+Stop Loss: ₹320
+Time Horizon: 2-3 months
+Confidence Level: High (100.0% success rate, 15 signals)
+Risk Level: Low
+Position Size: 5% of portfolio
+Strategy Used: CWH Strategy
+
+Key Risks:
+  • Market volatility
+  • Sector-specific risks
+  • Strategy performance may not repeat
+
+Fundamental Reasons for Buy Signal:
+Strong promoter holding; Potential for future growth; ROCE: Not Visible → Poor; Debt/Equity: Not Visible → High Risk; Valuation: Undervalued; Management guidance aligns with growth trends; Strategic initiatives supported by fundamentals
+
+====================================================================================================
+📈 ARTHALENS CORRELATED INSIGHTS
+==================================================
+
+====================================================================================================
+📊 ANALYSIS SUMMARY
+==================================================
+This comprehensive analysis combines:
+✅ Technical Analysis with advanced pattern recognition
+✅ Fundamental Analysis with Screener.in data extraction
+✅ Strategy Performance Analysis with historical backtesting
+✅ ArthaLens Transcript & Guidance Analysis
+✅ Correlated Insights between fundamental and management commentary
+✅ Growth Confidence and Valuation Assessment
+✅ Fundamental Metrics Correlation Analysis
+✅ Projected Growth Analysis
+
+The analysis provides a holistic view of DELHIVERY.NS considering both quantitative metrics and qualitative management insights.
+====================================================================================================

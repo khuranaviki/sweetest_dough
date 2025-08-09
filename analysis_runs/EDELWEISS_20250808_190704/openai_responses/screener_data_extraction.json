@@ -1,0 +1,73 @@
+{
+  "quarterly_results": {
+    "revenue": [
+      "1878",
+      "2020",
+      "2021",
+      "2234",
+      "1925",
+      "1896",
+      "1850",
+      "2020"
+    ],
+    "net_profit": [
+      "277",
+      "303",
+      "292",
+      "317",
+      "249",
+      "225",
+      "205",
+      "303"
+    ],
+    "ebitda": [
+      "Not Visible",
+      "Not Visible",
+      "Not Visible",
+      "Not Visible",
+      "Not Visible",
+      "Not Visible",
+      "Not Visible",
+      "Not Visible"
+    ]
+  },
+  "ratios": {
+    "roe": "15%",
+    "roce": "Not Visible",
+    "debt_to_equity": "0.41",
+    "current_ratio": "1.14",
+    "operating_margin": "14.74%",
+    "net_margin": "14.74%"
+  },
+  "valuation": {
+    "market_cap": "\u20b9 8,267",
+    "current_price": "\u20b9 955",
+    "book_value": "\u20b9 52.93",
+    "pe_ratio": "20.03",
+    "pb_ratio": "17.99",
+    "ev_ebitda": "Not Visible"
+  },
+  "shareholding": {
+    "promoter_holding": "49.53%",
+    "fii_holding": "22.76%",
+    "dii_holding": "2.61%",
+    "retail_holding": "25.10%"
+  },
+  "balance_sheet": {
+    "total_assets": "\u20b9 14,793",
+    "total_liabilities": "\u20b9 13,353",
+    "net_worth": "\u20b9 1,440",
+    "working_capital": "\u20b9 1,160"
+  },
+  "cash_flows": {
+    "operating_cf": "\u20b9 836",
+    "investing_cf": "\u20b9 -1,001",
+    "financing_cf": "\u20b9 901"
+  },
+  "profit_loss": {
+    "total_revenue": "\u20b9 8,267",
+    "total_expenses": "\u20b9 7,950",
+    "operating_profit": "\u20b9 317",
+    "net_profit": "\u20b9 303"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "business_quality": "Can't Say",
+  "market_penetration": "Not Available",
+  "pricing_power": "Not Available",
+  "revenue_growth": "\u20b9X Cr \u2192 \u20b9Y Cr",
+  "profit_growth": "\u20b9X Cr \u2192 \u20b9Y Cr",
+  "debt_to_equity": "X \u2192 Best/Good/High Risk",
+  "roce_roe": "X% \u2192 Excellent/Very Good/Poor",
+  "promoter_pledging": "X% \u00d7 Y% = Z \u2192 OK/Red Flag",
+  "retail_shareholding": "X% \u2192 Acceptable/Weak Hands Dominant",
+  "valuation_status": "Undervalued/Fair/Brand Premium",
+  "fair_value": "Not Available",
+  "financial_health": "Poor",
+  "multibagger_potential": "Not Available",
+  "fundamental_reasons": "list key drivers; ROCE: X% \u2192 Excellent/Very Good/Poor; Debt/Equity: X \u2192 Best/Good/High Risk; Valuation: Undervalued/Fair/Brand Premium; Management guidance aligns with growth trends; Strategic initiatives supported by fundamentals",
+  "confidence_score": "Strong/Medium/Low/Can't Say"
+}
