@@ -136,6 +136,8 @@ class EnhancedStockAnalysisChatApp:
             st.session_state.collected_data = {}
         if 'real_time_cost' not in st.session_state:
             st.session_state.real_time_cost = 0.0
+        if 'show_analysis' not in st.session_state:
+            st.session_state.show_analysis = False
             
     def setup_langchain(self):
         """Setup LangChain components"""
@@ -147,7 +149,7 @@ class EnhancedStockAnalysisChatApp:
                 
             self.llm = ChatOpenAI(
                 model=os.getenv('OPENAI_MODEL', 'gpt-5'),
-                temperature=0.7,
+                temperature=1,
                 openai_api_key=api_key
             )
             
@@ -852,6 +854,102 @@ class EnhancedStockAnalysisChatApp:
                         st.write(fundamental_reasons)
                 
         with tab3:
+            # Add Technical Chart Section
+            st.subheader("📊 Technical Analysis Chart")
+            
+            # Try to find the candlestick chart from the latest analysis run
+            chart_path = None
+            if 'analysis_data' in st.session_state and st.session_state.analysis_data:
+                # Look for chart in the current analysis data
+                analysis_data = st.session_state.analysis_data
+                if 'run_directory' in analysis_data:
+                    chart_path = os.path.join(analysis_data['run_directory'], 'screenshots', 'candlestick_DELHIVERY.png')
+                
+                # If not found, look in the most recent analysis run
+                if not chart_path or not os.path.exists(chart_path):
+                    analysis_runs_dir = 'analysis_runs'
+                    if os.path.exists(analysis_runs_dir):
+                        # Get the most recent run directory
+                        run_dirs = [d for d in os.listdir(analysis_runs_dir) if d.startswith('DELHIVERY_')]
+                        if run_dirs:
+                            latest_run = sorted(run_dirs)[-1]
+                            chart_path = os.path.join(analysis_runs_dir, latest_run, 'screenshots', f'candlestick_DELHIVERY.png')
+            
+            # Display the chart if found
+            if chart_path and os.path.exists(chart_path):
+                try:
+                    st.image(chart_path, caption="3-Year Candlestick Chart with Technical Indicators", use_container_width=True)
+                    
+                    # Add chart information
+                    st.info("🎯 **Chart Features:**\n"
+                           "• 3-year price history with support/resistance levels\n"
+                           "• Volume analysis and moving averages\n"
+                           "• RSI and Bollinger Bands indicators\n"
+                           "• Pattern recognition for RHS and Cup-with-Handle")
+                           
+                    # Display technical analysis summary if available
+                    if 'technical_analysis' in analysis_data:
+                        ta = analysis_data['technical_analysis']
+                        
+                        col1, col2, col3 = st.columns(3)
+                        with col1:
+                            st.metric("Trend", ta.get('trend', 'N/A'))
+                        with col2:
+                            st.metric("Entry Range", ta.get('entry_range', 'N/A'))
+                        with col3:
+                            st.metric("Target Price", ta.get('short_term_target', 'N/A'))
+                        
+                        # Display support and resistance levels
+                        support_levels = ta.get('support_levels', [])
+                        resistance_levels = ta.get('resistance_levels', [])
+                        
+                        if support_levels or resistance_levels:
+                            st.markdown("#### 📊 Key Levels")
+                            col1, col2 = st.columns(2)
+                            
+                            with col1:
+                                st.markdown("**Support Levels:**")
+                                if support_levels:
+                                    for level in support_levels[:3]:  # Show top 3
+                                        st.write(f"• ₹{level}")
+                                else:
+                                    st.write("Not available")
+                            
+                            with col2:
+                                st.markdown("**Resistance Levels:**")
+                                if resistance_levels:
+                                    for level in resistance_levels[:3]:  # Show top 3
+                                        st.write(f"• ₹{level}")
+                                else:
+                                    st.write("Not available")
+                        
+                        # Display chart patterns
+                        patterns = ta.get('patterns', [])
+                        if patterns:
+                            st.markdown("#### 🎯 Identified Patterns")
+                            for pattern in patterns:
+                                st.write(f"• {pattern}")
+                        
+                except Exception as e:
+                    st.error(f"Error displaying chart: {e}")
+                    
+            else:
+                # Show a placeholder when no chart is available
+                st.info("📊 Candlestick chart will be displayed here after running the analysis.")
+                st.markdown("""
+                **What you'll see:**
+                - 3-year price history with volume
+                - Support and resistance levels
+                - Technical indicators (RSI, Bollinger Bands)
+                - Chart patterns (RHS, Cup-with-Handle)
+                - Entry and target recommendations
+                """)
+            
+            st.markdown("---")  # Separator
+            
+            # Existing Strategy Backtesting Section
+            st.subheader("🎯 Strategy Backtesting")
+            
             if 'strategy_backtesting' in analysis_data:
                 sb = analysis_data['strategy_backtesting']
                 
@@ -904,56 +1002,230 @@ class EnhancedStockAnalysisChatApp:
                             st.metric("Best Strategy", "N/A")
                     
         with tab4:
-            if 'recommendation' in analysis_data:
-                rec = analysis_data['recommendation']
+            # Generate intelligent recommendation
+            intelligent_rec = self.generate_intelligent_recommendation(analysis_data)
+            
+            # Main recommendation display
+            action = intelligent_rec['action']
+            confidence = intelligent_rec['confidence']
+            
+            # Color-coded action display
+            if action == 'BUY':
+                st.success(f"🚀 **RECOMMENDATION: {action}**")
+                action_color = "🟢"
+            elif action == 'SELL':
+                st.error(f"⚠️ **RECOMMENDATION: {action}**")
+                action_color = "🔴"
+            else:  # HOLD
+                st.warning(f"⏸️ **RECOMMENDATION: {action}**")
+                action_color = "🟡"
+            
+            # Confidence and overall score
+            col1, col2, col3 = st.columns(3)
+            with col1:
+                st.metric("Action", f"{action_color} {action}")
+            with col2:
+                st.metric("Confidence", confidence)
+            with col3:
+                st.metric("Overall Score", f"{intelligent_rec['overall_score']:.0f}/100")
+            
+            st.markdown("---")
+            
+            # Analysis Breakdown
+            st.subheader("📊 Analysis Breakdown")
+            
+            # Score breakdown
+            col1, col2, col3 = st.columns(3)
+            
+            with col1:
+                tech_score = intelligent_rec['technical_score']
+                tech_color = "🟢" if tech_score >= 70 else "🟡" if tech_score >= 50 else "🔴"
+                st.metric("Technical Score", f"{tech_color} {tech_score}/100")
                 
-                # Check if we have any real recommendation data
-                has_rec_data = any(
-                    value != 'Not Available' and value != [] and value is not None 
-                    for value in rec.values()
-                )
+                # Technical details
+                if 'technical_analysis' in analysis_data:
+                    ta = analysis_data['technical_analysis']
+                    upside = self._calculate_upside_potential(ta)
+                    if upside > 0:
+                        st.write(f"📈 Target Upside: +{upside:.1f}%")
+                    elif upside < 0:
+                        st.write(f"📉 Target Downside: {upside:.1f}%")
+                    else:
+                        st.write("📊 No clear target")
+            
+            with col2:
+                fund_score = intelligent_rec['fundamental_score']
+                fund_color = "🟢" if fund_score >= 70 else "🟡" if fund_score >= 50 else "🔴"
+                st.metric("Fundamental Score", f"{fund_color} {fund_score}/100")
                 
-                if not has_rec_data:
-                    st.info("📋 Recommendation data not available.")
+                # Fundamental highlights
+                if 'fundamental_analysis' in analysis_data:
+                    fa = analysis_data['fundamental_analysis']
+                    st.write(f"💼 Business: {fa.get('business_quality', 'N/A')}")
+                    st.write(f"💰 Valuation: {fa.get('valuation_status', 'N/A')}")
+                    st.write(f"📈 Health: {fa.get('financial_health', 'N/A')}")
+            
+            with col3:
+                corr_score = intelligent_rec['correlation_score']
+                corr_color = "🟢" if corr_score >= 60 else "🟡" if corr_score >= 40 else "🔴"
+                st.metric("Correlation Score", f"{corr_color} {corr_score}/100")
+                
+                # Correlation indicators
+                has_enhanced = 'enhanced_fundamental_data' in analysis_data
+                st.write(f"📊 Enhanced Data: {'✅' if has_enhanced else '❌'}")
+                
+                fund_reasons = analysis_data.get('fundamental_analysis', {}).get('fundamental_reasons', '')
+                has_reasoning = fund_reasons and fund_reasons != 'Not Available' and len(fund_reasons) > 50
+                st.write(f"🧠 Deep Analysis: {'✅' if has_reasoning else '❌'}")
+            
+            st.markdown("---")
+            
+            # Detailed Reasoning
+            st.subheader("🧠 Recommendation Reasoning")
+            
+            reasoning = intelligent_rec.get('reasoning', [])
+            if reasoning:
+                for i, reason in enumerate(reasoning, 1):
+                    st.write(f"{i}. {reason}")
+            else:
+                st.write("No specific reasoning available.")
+            
+            st.markdown("---")
+            
+            # Criteria Explanation
+            with st.expander("📋 Recommendation Criteria", expanded=False):
+                st.markdown("""
+                **BUY Criteria:**
+                - 🎯 Technical target >20% above current price
+                - 💪 Fundamental analysis passes all quality parameters (score ≥70)
+                - 🔗 Correlation analysis supports growth thesis (score ≥60)
+                
+                **HOLD Criteria:**
+                - 📈 Technical target 0-20% above current price  
+                - ✅ Fundamental analysis shows strength (score ≥70)
+                - 🤝 Correlation analysis supports thesis (score ≥60)
+                
+                **SELL Criteria:**
+                - ⚠️ Technical target below current price, OR
+                - ❌ Fundamental analysis shows weakness (score <70), OR
+                - 🔴 Correlation analysis doesn't support growth thesis (score <60)
+                """)
+            
+            # Position sizing and risk management
+            if action in ['BUY', 'HOLD']:
+                st.markdown("---")
+                st.subheader("💼 Position Sizing & Risk Management")
+                
+                # Calculate suggested position size based on confidence and scores
+                if confidence == 'High':
+                    position_size = "3-5% of portfolio"
+                elif confidence == 'Medium':
+                    position_size = "2-3% of portfolio"
                 else:
-                    action = rec.get('action', 'Not Available')
-                    confidence = rec.get('confidence', 'Not Available')
+                    position_size = "1-2% of portfolio"
+                
+                col1, col2 = st.columns(2)
+                with col1:
+                    st.metric("Suggested Position Size", position_size)
                     
-                    if action != 'Not Available':
-                        st.metric("Action", action, delta=confidence if confidence != 'Not Available' else None)
-                    else:
-                        st.metric("Action", "N/A")
+                    # Entry strategy
+                    if 'technical_analysis' in analysis_data:
+                        entry_range = analysis_data['technical_analysis'].get('entry_range', 'N/A')
+                        st.metric("Entry Range", entry_range)
+                
+                with col2:
+                    # Target and stop loss
+                    if 'technical_analysis' in analysis_data:
+                        ta = analysis_data['technical_analysis']
+                        target = ta.get('short_term_target', 'N/A')
+                        stop_loss = ta.get('stop_loss', 'N/A')
                         
-                    col1, col2 = st.columns(2)
-                    with col1:
-                        position_size = rec.get('position_size', 'Not Available')
-                        if position_size != 'Not Available':
-                            st.metric("Position Size", position_size)
-                        else:
-                            st.metric("Position Size", "N/A")
-                            
-                        time_horizon = rec.get('time_horizon', 'Not Available')
-                        if time_horizon != 'Not Available':
-                            st.metric("Time Horizon", time_horizon)
-                        else:
-                            st.metric("Time Horizon", "N/A")
-                            
-                    with col2:
-                        if confidence != 'Not Available':
-                            st.metric("Confidence", confidence)
-                        else:
-                            st.metric("Confidence", "N/A")
+                        st.metric("Target Price", target)
+                        st.metric("Stop Loss", stop_loss)
+            
+            # Risk factors
+            st.markdown("---")
+            st.subheader("⚠️ Key Risks to Monitor")
+            
+            # Generate risk factors based on analysis
+            risk_factors = []
+            
+            if intelligent_rec['technical_score'] < 60:
+                risk_factors.append("Technical momentum may be weakening")
+            
+            if intelligent_rec['fundamental_score'] < 60:
+                risk_factors.append("Fundamental metrics show concerns")
+            
+            if intelligent_rec['correlation_score'] < 50:
+                risk_factors.append("Mixed signals between technical and fundamental analysis")
+            
+            # Check specific fundamental risks
+            if 'fundamental_analysis' in analysis_data:
+                fa = analysis_data['fundamental_analysis']
+                if 'high' in fa.get('debt_to_equity', '').lower() or '2.' in fa.get('debt_to_equity', ''):
+                    risk_factors.append("High debt levels may impact growth")
+                
+                if 'overvalued' in fa.get('valuation_status', '').lower():
+                    risk_factors.append("Current valuation appears stretched")
+                
+                if 'weak' in fa.get('financial_health', '').lower():
+                    risk_factors.append("Financial health shows warning signs")
+            
+            # Add general market risks
+            risk_factors.extend([
+                "Market volatility and macroeconomic factors",
+                "Sector-specific regulatory changes",
+                "Competition and industry dynamics"
+            ])
+            
+            for i, risk in enumerate(risk_factors, 1):
+                st.write(f"{i}. {risk}")
+                
+            # Fall back to old recommendation display if no data available
+            if intelligent_rec['overall_score'] == 0:
+                st.markdown("---")
+                st.info("ℹ️ Using basic recommendation data (intelligent analysis unavailable)")
+                
+                if 'recommendation' in analysis_data:
+                    rec = analysis_data['recommendation']
                     
-                    # Key Risks
-                    key_risks = rec.get('key_risks', [])
-                    if key_risks:
-                        st.subheader("Key Risks")
-                        for risk in key_risks:
-                            st.write(f"• {risk}")
-                    else:
-                        st.subheader("Key Risks")
-                        st.write("Not Available")
+                    # Check if we have any real recommendation data
+                    has_rec_data = any(
+                        value != 'Not Available' and value != [] and value is not None 
+                        for value in rec.values()
+                    )
+                    
+                    if has_rec_data:
+                        action = rec.get('action', 'Not Available')
+                        confidence = rec.get('confidence', 'Not Available')
                         
+                        if action != 'Not Available':
+                            st.metric("Basic Action", action, delta=confidence if confidence != 'Not Available' else None)
+                        
+                        # Basic details
+                        col1, col2 = st.columns(2)
+                        with col1:
+                            position_size = rec.get('position_size', 'Not Available')
+                            if position_size != 'Not Available':
+                                st.metric("Position Size", position_size)
+                            
+                            time_horizon = rec.get('time_horizon', 'Not Available')
+                            if time_horizon != 'Not Available':
+                                st.metric("Time Horizon", time_horizon)
+                        
+                        with col2:
+                            if confidence != 'Not Available':
+                                st.metric("Confidence", confidence)
+                        
+                        # Basic risks
+                        key_risks = rec.get('key_risks', [])
+                        if key_risks:
+                            st.subheader("Key Risks")
+                            for risk in key_risks:
+                                st.write(f"• {risk}")
+                    else:
+                        st.info("📋 Recommendation data not available.")
+                
         with tab5:
             # Comprehensive Narrative Analysis
             st.subheader("📖 Comprehensive Narrative Analysis")
@@ -1146,6 +1418,34 @@ The strong correlation between current fundamental performance and management's 
                 'error': str(e)
             }
             
+    def load_sample_analysis_data(self):
+        """Load sample analysis data from the latest analysis run for testing"""
+        try:
+            # Look for the most recent analysis run
+            analysis_runs_dir = 'analysis_runs'
+            if os.path.exists(analysis_runs_dir):
+                run_dirs = [d for d in os.listdir(analysis_runs_dir) if d.startswith('DELHIVERY_')]
+                if run_dirs:
+                    latest_run = sorted(run_dirs)[-1]
+                    results_file = os.path.join(analysis_runs_dir, latest_run, 'final_analysis_results.json')
+                    
+                    if os.path.exists(results_file):
+                        with open(results_file, 'r') as f:
+                            data = json.load(f)
+                        
+                        # Add run directory info for chart path
+                        data['run_directory'] = os.path.join(analysis_runs_dir, latest_run)
+                        
+                        print(f"✅ Loaded sample data from: {latest_run}")
+                        return data
+            
+            # Fallback to sample data if no runs available
+            return self.generate_sample_data()
+            
+        except Exception as e:
+            print(f"❌ Error loading sample data: {e}")
+            return self.generate_sample_data()
+            
     def run(self):
         """Main application loop"""
         # Header
@@ -1166,6 +1466,26 @@ The strong correlation between current fundamental performance and management's 
                 cost_estimate = self.estimate_analysis_cost(company_name)
                 st.session_state.cost_estimate = cost_estimate
                 st.rerun()
+            
+            # Add test button for loading sample data
+            col1, col2 = st.columns(2)
+            with col1:
+                if st.button("🧪 Load Test Data", help="Load data from the latest analysis run for testing"):
+                    sample_data = self.load_sample_analysis_data()
+                    if sample_data:
+                        st.session_state.analysis_data = sample_data
+                        st.session_state.show_analysis = True
+                        st.success("✅ Test data loaded! Check the Analysis Results section below.")
+                        st.rerun()
+                    else:
+                        st.error("❌ Could not load test data")
+            
+            with col2:
+                if st.button("🧹 Clear Data", help="Clear loaded test data"):
+                    st.session_state.analysis_data = {}
+                    st.session_state.show_analysis = False
+                    st.success("✅ Data cleared!")
+                    st.rerun()
                 
             # Display cost estimate if available
             if st.session_state.cost_estimate:
@@ -1177,6 +1497,12 @@ The strong correlation between current fundamental performance and management's 
                 
             # Data collection progress
             self.display_data_collection()
+            
+        # Display analysis results if available (either from real analysis or test data)
+        if st.session_state.show_analysis and st.session_state.analysis_data:
+            st.markdown("---")
+            st.header("📊 Analysis Results")
+            self.display_analysis_results(st.session_state.analysis_data)
                 
         # Main chat interface
         st.header("💬 Chat Interface")
@@ -1262,6 +1588,535 @@ The strong correlation between current fundamental performance and management's 
             if hasattr(st.session_state, 'data_collection'):
                 st.session_state.data_collection = []
             st.rerun()
+
+    def generate_intelligent_recommendation(self, analysis_data: Dict) -> Dict:
+        """Generate intelligent recommendation based on technical, fundamental, and correlation analysis"""
+        try:
+            # Extract analysis components
+            technical = analysis_data.get('technical_analysis', {})
+            fundamental = analysis_data.get('fundamental_analysis', {})
+            
+            # Initialize recommendation components
+            recommendation = {
+                'action': 'HOLD',
+                'confidence': 'Medium',
+                'reasoning': [],
+                'technical_score': 0,
+                'fundamental_score': 0,
+                'correlation_score': 0,
+                'overall_score': 0
+            }
+            
+            # 1. TECHNICAL ANALYSIS SCORING
+            technical_score = self._evaluate_technical_signals(technical)
+            recommendation['technical_score'] = technical_score
+            
+            # 2. FUNDAMENTAL ANALYSIS SCORING  
+            fundamental_score = self._evaluate_fundamental_strength(fundamental)
+            recommendation['fundamental_score'] = fundamental_score
+            
+            # 3. CORRELATION ANALYSIS SCORING
+            correlation_score = self._evaluate_correlation_support(analysis_data)
+            recommendation['correlation_score'] = correlation_score
+            
+            # 4. CALCULATE OVERALL SCORE
+            overall_score = (technical_score + fundamental_score + correlation_score) / 3
+            recommendation['overall_score'] = overall_score
+            
+            # 5. DETERMINE RECOMMENDATION BASED ON CRITERIA
+            action, confidence, reasoning = self._determine_recommendation_action(
+                technical_score, fundamental_score, correlation_score, technical, fundamental
+            )
+            
+            recommendation.update({
+                'action': action,
+                'confidence': confidence,
+                'reasoning': reasoning
+            })
+            
+            return recommendation
+            
+        except Exception as e:
+            return {
+                'action': 'HOLD',
+                'confidence': 'Low',
+                'reasoning': [f'Error in recommendation analysis: {str(e)}'],
+                'technical_score': 0,
+                'fundamental_score': 0,
+                'correlation_score': 0,
+                'overall_score': 0
+            }
+    
+    def _evaluate_technical_signals(self, technical: Dict) -> int:
+        """Evaluate technical analysis signals (0-100 scale)"""
+        score = 50  # Start with neutral
+        
+        try:
+            # Check trend
+            trend = technical.get('trend', '').lower()
+            if 'bullish' in trend:
+                score += 20
+            elif 'bearish' in trend:
+                score -= 20
+            
+            # Check target vs current price (estimate upside potential)
+            current_price_str = technical.get('entry_range', '')
+            target_str = technical.get('short_term_target', '')
+            
+            if current_price_str and target_str:
+                try:
+                    # Extract numbers from price strings
+                    import re
+                    current_match = re.search(r'(\d+)', current_price_str.replace('₹', '').replace(',', ''))
+                    target_match = re.search(r'(\d+)', target_str.replace('₹', '').replace(',', ''))
+                    
+                    if current_match and target_match:
+                        current_price = float(current_match.group(1))
+                        target_price = float(target_match.group(1))
+                        
+                        if current_price > 0:
+                            upside_percent = ((target_price - current_price) / current_price) * 100
+                            
+                            if upside_percent > 20:
+                                score += 25  # Strong upside potential
+                            elif upside_percent > 10:
+                                score += 15  # Good upside potential
+                            elif upside_percent > 0:
+                                score += 10  # Modest upside potential
+                            else:
+                                score -= 20  # Downside risk
+                except:
+                    pass
+            
+            # Check confidence level
+            confidence = technical.get('confidence_score', '').lower()
+            if 'high' in confidence:
+                score += 10
+            elif 'low' in confidence:
+                score -= 10
+            
+            # Check patterns
+            patterns = technical.get('patterns', [])
+            positive_patterns = ['breakout', 'golden cross', 'higher highs', 'cup', 'ascending']
+            negative_patterns = ['breakdown', 'death cross', 'lower lows', 'descending']
+            
+            for pattern in patterns:
+                pattern_lower = pattern.lower()
+                if any(pos in pattern_lower for pos in positive_patterns):
+                    score += 5
+                elif any(neg in pattern_lower for neg in negative_patterns):
+                    score -= 5
+            
+        except Exception as e:
+            print(f"Error in technical evaluation: {e}")
+        
+        return max(0, min(100, score))  # Clamp between 0-100
+    
+    def _evaluate_fundamental_strength(self, fundamental: Dict) -> int:
+        """Evaluate fundamental analysis strength (0-100 scale) with enhanced growth metrics"""
+        score = 50  # Start with neutral
+        
+        try:
+            # Business Quality
+            business_quality = fundamental.get('business_quality', '').lower()
+            if 'strong' in business_quality or 'excellent' in business_quality:
+                score += 15
+            elif 'good' in business_quality:
+                score += 10
+            elif 'weak' in business_quality or 'poor' in business_quality:
+                score -= 15
+            
+            # Market Penetration
+            market_penetration = fundamental.get('market_penetration', '').lower()
+            if 'strong' in market_penetration or 'dominant' in market_penetration:
+                score += 10
+            elif 'weak' in market_penetration:
+                score -= 10
+            
+            # Financial Health
+            financial_health = fundamental.get('financial_health', '').lower()
+            if 'excellent' in financial_health:
+                score += 15
+            elif 'good' in financial_health:
+                score += 10
+            elif 'average' in financial_health:
+                score += 0
+            elif 'poor' in financial_health or 'weak' in financial_health:
+                score -= 15
+            
+            # Valuation Status
+            valuation = fundamental.get('valuation_status', '').lower()
+            if 'undervalued' in valuation or 'cheap' in valuation:
+                score += 15
+            elif 'fair' in valuation:
+                score += 5
+            elif 'overvalued' in valuation or 'expensive' in valuation:
+                score -= 15
+            
+            # Multibagger Potential
+            multibagger = fundamental.get('multibagger_potential', '').lower()
+            if 'high' in multibagger or 'strong' in multibagger:
+                score += 15
+            elif 'moderate' in multibagger:
+                score += 8
+            elif 'low' in multibagger or 'weak' in multibagger:
+                score -= 10
+            
+            # ROCE/ROE Analysis
+            roce_roe = fundamental.get('roce_roe', '')
+            if roce_roe and roce_roe != 'N/A':
+                try:
+                    # Extract ROE percentage
+                    import re
+                    roe_match = re.search(r'ROE.*?(\d+\.?\d*)%', roce_roe)
+                    if roe_match:
+                        roe_value = float(roe_match.group(1))
+                        if roe_value > 15:
+                            score += 10
+                        elif roe_value > 10:
+                            score += 5
+                        elif roe_value < 5:
+                            score -= 10
+                except:
+                    pass
+            
+            # Debt to Equity
+            debt_equity = fundamental.get('debt_to_equity', '')
+            if debt_equity and debt_equity != 'N/A':
+                try:
+                    de_ratio = float(debt_equity.replace('%', ''))
+                    if de_ratio < 0.5:
+                        score += 10
+                    elif de_ratio < 1.0:
+                        score += 5
+                    elif de_ratio > 2.0:
+                        score -= 15
+                except:
+                    pass
+            
+            # Enhanced Growth Metrics Analysis is now handled by the core system
+            
+        except Exception as e:
+            print(f"Error in fundamental evaluation: {e}")
+        
+        return max(0, min(100, score))  # Clamp between 0-100
+    
+    def _evaluate_correlation_support(self, analysis_data: Dict) -> int:
+        """Evaluate correlation analysis support (0-100 scale)"""
+        score = 50  # Start with neutral
+        
+        try:
+            # Check if we have enhanced fundamental data (indicates good data quality)
+            if 'enhanced_fundamental_data' in analysis_data:
+                score += 15
+            
+            # Check if fundamental reasons are provided
+            fundamental = analysis_data.get('fundamental_analysis', {})
+            fundamental_reasons = fundamental.get('fundamental_reasons', '')
+            
+            if fundamental_reasons and fundamental_reasons != 'Not Available':
+                if len(fundamental_reasons) > 100:  # Substantial reasoning provided
+                    score += 15
+                else:
+                    score += 10
+            
+            # Check confidence levels alignment
+            tech_confidence = analysis_data.get('technical_analysis', {}).get('confidence_score', '').lower()
+            fund_confidence = fundamental.get('confidence_score', '').lower()
+            
+            if 'high' in tech_confidence and ('strong' in fund_confidence or 'high' in fund_confidence):
+                score += 20  # Strong alignment
+            elif ('medium' in tech_confidence and 'medium' in fund_confidence) or \
+                 ('moderate' in tech_confidence and 'moderate' in fund_confidence):
+                score += 10  # Good alignment
+            elif ('low' in tech_confidence and 'low' in fund_confidence):
+                score -= 10  # Poor but aligned
+            elif ('high' in tech_confidence and 'low' in fund_confidence) or \
+                 ('low' in tech_confidence and 'high' in fund_confidence):
+                score -= 20  # Misaligned signals
+            
+        except Exception as e:
+            print(f"Error in correlation evaluation: {e}")
+        
+        return max(0, min(100, score))  # Clamp between 0-100
+    
+    def _determine_recommendation_action(self, tech_score: int, fund_score: int, corr_score: int, 
+                                       technical: Dict, fundamental: Dict) -> tuple:
+        """Determine final recommendation action based on scores and criteria"""
+        
+        reasoning = []
+        
+        # Calculate upside potential from technical analysis
+        upside_percent = self._calculate_upside_potential(technical)
+        
+        # Evaluate fundamental strength
+        fundamental_strong = fund_score >= 70
+        technical_strong = tech_score >= 70
+        correlation_supportive = corr_score >= 60
+        
+        # Generate detailed fundamental analysis summary
+        fund_details = self._analyze_fundamental_details(fundamental, fund_score)
+        
+        # Generate detailed correlation analysis summary
+        corr_details = self._analyze_correlation_details(fund_score, tech_score, corr_score)
+        
+        # BUY CRITERIA
+        if (upside_percent > 20 and technical_strong and 
+            fundamental_strong and correlation_supportive):
+            
+            reasoning.append(f"🎯 Strong technical signals with {upside_percent:.1f}% upside potential")
+            reasoning.append(f"💪 Fundamental analysis passes all parameters (score: {fund_score}/100)")
+            reasoning.extend(fund_details['strengths'])
+            reasoning.append(f"🔗 Correlation analysis supports growth thesis (score: {corr_score}/100)")
+            reasoning.extend(corr_details['strengths'])
+            return 'BUY', 'High', reasoning
+        
+        # HOLD CRITERIA  
+        elif (0 < upside_percent <= 20 and technical_strong and 
+              fundamental_strong and correlation_supportive):
+            
+            reasoning.append(f"📈 Modest technical upside of {upside_percent:.1f}% (good but not exceptional)")
+            reasoning.append(f"✅ Fundamental strength confirmed (score: {fund_score}/100)")
+            reasoning.extend(fund_details['strengths'])
+            if fund_details['concerns']:
+                reasoning.append("⚠️ Fundamental concerns to monitor:")
+                reasoning.extend(fund_details['concerns'])
+            reasoning.append(f"🤝 Correlation analysis supports thesis (score: {corr_score}/100)")
+            reasoning.extend(corr_details['strengths'])
+            if corr_details['concerns']:
+                reasoning.append("⚠️ Correlation analysis concerns:")
+                reasoning.extend(corr_details['concerns'])
+            return 'HOLD', 'Medium', reasoning
+        
+        # SELL CRITERIA
+        elif (upside_percent < 0 or not fundamental_strong or not correlation_supportive):
+            
+            if upside_percent < 0:
+                reasoning.append(f"⚠️ Technical target below current price ({upside_percent:.1f}% downside)")
+            if not fundamental_strong:
+                reasoning.append(f"❌ Fundamental analysis shows weakness (score: {fund_score}/100)")
+                reasoning.extend(fund_details['weaknesses'])
+            if not correlation_supportive:
+                reasoning.append(f"🔴 Correlation analysis doesn't support growth thesis (score: {corr_score}/100)")
+                reasoning.extend(corr_details['weaknesses'])
+            
+            return 'SELL', 'Medium' if len(reasoning) == 1 else 'High', reasoning
+        
+        # DEFAULT HOLD
+        else:
+            reasoning.append(f"📊 Mixed signals - Technical: {tech_score}/100, Fundamental: {fund_score}/100")
+            reasoning.append(f"🔄 Upside potential: {upside_percent:.1f}%")
+            
+            # Add detailed analysis for mixed signals
+            if fund_score < 70:
+                reasoning.append("⚠️ Fundamental concerns:")
+                reasoning.extend(fund_details['concerns'] + fund_details['weaknesses'])
+            
+            if corr_score < 60:
+                reasoning.append("⚠️ Correlation analysis concerns:")
+                reasoning.extend(corr_details['concerns'] + corr_details['weaknesses'])
+            
+            reasoning.append("⚖️ Awaiting clearer directional signals")
+            return 'HOLD', 'Low', reasoning
+    
+    def _analyze_fundamental_details(self, fundamental: Dict, fund_score: int) -> Dict:
+        """Provide detailed analysis of fundamental strengths and weaknesses with growth metrics"""
+        details = {
+            'strengths': [],
+            'concerns': [],
+            'weaknesses': []
+        }
+        
+        try:
+            # Growth analysis is now integrated in the core system and available in fundamental_reasons
+            
+            # Business Quality Analysis
+            business_quality = fundamental.get('business_quality', '').lower()
+            if 'strong' in business_quality or 'excellent' in business_quality:
+                details['strengths'].append("  • Excellent business model with strong competitive advantages")
+            elif 'good' in business_quality:
+                details['strengths'].append("  • Solid business fundamentals with decent competitive position")
+            elif 'weak' in business_quality or 'poor' in business_quality:
+                details['weaknesses'].append("  • Weak business model with limited competitive advantages")
+            elif 'low' in business_quality:
+                details['concerns'].append("  • Business quality rated as low - needs improvement in core operations")
+            
+            # Market Penetration Analysis
+            market_penetration = fundamental.get('market_penetration', '').lower()
+            if 'strong' in market_penetration or 'dominant' in market_penetration:
+                details['strengths'].append("  • Strong market presence with significant penetration")
+            elif 'weak' in market_penetration:
+                details['weaknesses'].append("  • Limited market penetration - growth potential questionable")
+            
+            # Financial Health Analysis
+            financial_health = fundamental.get('financial_health', '').lower()
+            if 'excellent' in financial_health:
+                details['strengths'].append("  • Excellent financial health with strong balance sheet")
+            elif 'good' in financial_health:
+                details['strengths'].append("  • Good financial health supporting growth initiatives")
+            elif 'average' in financial_health:
+                details['concerns'].append("  • Average financial health - room for improvement in key metrics")
+            elif 'poor' in financial_health or 'weak' in financial_health:
+                details['weaknesses'].append("  • Poor financial health raises concerns about sustainability")
+            
+            # Valuation Analysis
+            valuation = fundamental.get('valuation_status', '').lower()
+            if 'undervalued' in valuation or 'cheap' in valuation:
+                details['strengths'].append("  • Attractive valuation provides good entry opportunity")
+            elif 'fair' in valuation:
+                details['concerns'].append("  • Fair valuation - limited margin of safety")
+            elif 'overvalued' in valuation or 'expensive' in valuation:
+                details['weaknesses'].append("  • Overvalued at current levels - high risk of correction")
+            
+            # Multibagger Potential
+            multibagger = fundamental.get('multibagger_potential', '').lower()
+            if 'high' in multibagger or 'strong' in multibagger:
+                details['strengths'].append("  • High multibagger potential for long-term wealth creation")
+            elif 'moderate' in multibagger:
+                details['strengths'].append("  • Moderate multibagger potential with steady growth prospects")
+            elif 'low' in multibagger or 'weak' in multibagger:
+                details['concerns'].append("  • Limited multibagger potential - mature business with slow growth")
+            
+            # ROCE/ROE Analysis
+            roce_roe = fundamental.get('roce_roe', '')
+            if roce_roe and roce_roe != 'N/A':
+                try:
+                    import re
+                    roe_match = re.search(r'ROE.*?(\d+\.?\d*)%', roce_roe)
+                    roce_match = re.search(r'ROCE.*?(\d+\.?\d*)%', roce_roe)
+                    
+                    if roe_match:
+                        roe_value = float(roe_match.group(1))
+                        if roe_value > 15:
+                            details['strengths'].append(f"  • Excellent ROE of {roe_value}% shows efficient use of equity")
+                        elif roe_value > 10:
+                            details['strengths'].append(f"  • Good ROE of {roe_value}% indicates decent profitability")
+                        elif roe_value < 5:
+                            details['weaknesses'].append(f"  • Poor ROE of {roe_value}% raises profitability concerns")
+                        else:
+                            details['concerns'].append(f"  • Moderate ROE of {roe_value}% - room for improvement")
+                    
+                    if roce_match:
+                        roce_value = float(roce_match.group(1))
+                        if roce_value > 15:
+                            details['strengths'].append(f"  • Strong ROCE of {roce_value}% shows efficient capital allocation")
+                        elif roce_value < 5:
+                            details['weaknesses'].append(f"  • Weak ROCE of {roce_value}% indicates poor capital efficiency")
+                        else:
+                            details['concerns'].append(f"  • Moderate ROCE of {roce_value}% - capital efficiency needs improvement")
+                except:
+                    details['concerns'].append(f"  • ROCE/ROE metrics: {roce_roe} - requires detailed analysis")
+            
+            # Debt Analysis
+            debt_equity = fundamental.get('debt_to_equity', '')
+            if debt_equity and debt_equity != 'N/A':
+                try:
+                    de_ratio = float(debt_equity.replace('%', ''))
+                    if de_ratio < 0.5:
+                        details['strengths'].append(f"  • Low debt-to-equity ratio of {de_ratio} indicates strong financial stability")
+                    elif de_ratio < 1.0:
+                        details['strengths'].append(f"  • Manageable debt-to-equity ratio of {de_ratio}")
+                    elif de_ratio > 2.0:
+                        details['weaknesses'].append(f"  • High debt-to-equity ratio of {de_ratio} raises solvency concerns")
+                    else:
+                        details['concerns'].append(f"  • Elevated debt-to-equity ratio of {de_ratio} needs monitoring")
+                except:
+                    details['concerns'].append(f"  • Debt-to-equity ratio: {debt_equity} - requires assessment")
+            
+            # Growth metrics are now calculated by the core EnhancedFundamentalAnalysisAgent
+            # and included in the fundamental_reasons field with detailed analysis
+            
+            # Extract growth information from fundamental_reasons if available
+            fundamental_reasons = fundamental.get('fundamental_reasons', '')
+            if 'Growth Analysis:' in fundamental_reasons:
+                # Extract growth highlights from the core system's analysis
+                growth_section = fundamental_reasons.split('Growth Highlights:')
+                if len(growth_section) > 1:
+                    growth_highlights = growth_section[1].split('Financial Metrics:')[0].strip()
+                    for line in growth_highlights.split('\n'):
+                        if line.strip().startswith('•'):
+                            details['strengths'].append(f"  {line.strip()}")
+            
+            # Business Quality Analysis
+            
+        except Exception as e:
+            details['concerns'].append(f"  • Error analyzing fundamental details: {str(e)}")
+        
+        return details
+    
+    def _calculate_upside_potential(self, technical: Dict) -> float:
+        """Calculate upside potential percentage from technical analysis"""
+        try:
+            current_price_str = technical.get('entry_range', '')
+            target_str = technical.get('short_term_target', '')
+            
+            if current_price_str and target_str:
+                import re
+                current_match = re.search(r'(\d+)', current_price_str.replace('₹', '').replace(',', ''))
+                target_match = re.search(r'(\d+)', target_str.replace('₹', '').replace(',', ''))
+                
+                if current_match and target_match:
+                    current_price = float(current_match.group(1))
+                    target_price = float(target_match.group(1))
+                    
+                    if current_price > 0:
+                        return ((target_price - current_price) / current_price) * 100
+            
+            return 0.0
+        except:
+            return 0.0
+    
+    def _analyze_correlation_details(self, fund_score: int, tech_score: int, corr_score: int) -> Dict:
+        """Provide detailed analysis of correlation strengths and weaknesses"""
+        details = {
+            'strengths': [],
+            'concerns': [],
+            'weaknesses': []
+        }
+        
+        try:
+            # Score Alignment Analysis
+            score_diff = abs(fund_score - tech_score)
+            if score_diff <= 10:
+                details['strengths'].append(f"  • Strong alignment between technical ({tech_score}) and fundamental ({fund_score}) analysis")
+            elif score_diff <= 20:
+                details['concerns'].append(f"  • Moderate divergence between technical ({tech_score}) and fundamental ({fund_score}) signals")
+            else:
+                details['weaknesses'].append(f"  • Significant divergence between technical ({tech_score}) and fundamental ({fund_score}) analysis")
+            
+            # Data Quality Assessment
+            if corr_score >= 80:
+                details['strengths'].append("  • High-quality comprehensive data supports reliable analysis")
+            elif corr_score >= 60:
+                details['strengths'].append("  • Good data quality enables confident decision making")
+            elif corr_score >= 40:
+                details['concerns'].append("  • Moderate data quality - some analysis gaps may exist")
+            else:
+                details['weaknesses'].append("  • Limited data quality hampers comprehensive analysis")
+            
+            # Confidence Level Correlation
+            if fund_score >= 70 and tech_score >= 70:
+                details['strengths'].append("  • Both technical and fundamental analysis show strong conviction")
+            elif fund_score >= 50 and tech_score >= 50:
+                details['strengths'].append("  • Reasonable confidence from both technical and fundamental perspectives")
+            elif fund_score < 50 or tech_score < 50:
+                if fund_score < 50:
+                    details['concerns'].append("  • Fundamental analysis shows limited conviction")
+                if tech_score < 50:
+                    details['concerns'].append("  • Technical analysis lacks strong directional bias")
+            
+            # Overall Correlation Assessment
+            if corr_score >= 70:
+                details['strengths'].append("  • Strong correlation between multiple analysis factors")
+            elif corr_score >= 50:
+                details['concerns'].append("  • Moderate correlation - some conflicting signals present")
+            else:
+                details['weaknesses'].append("  • Weak correlation suggests conflicting analysis outcomes")
+            
+        except Exception as e:
+            details['concerns'].append(f"  • Error analyzing correlation details: {str(e)}")
+        
+        return details
 
 def main():
     """Main function to run the Streamlit app"""

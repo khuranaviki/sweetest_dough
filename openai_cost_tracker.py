@@ -50,12 +50,18 @@ class OpenAICostTracker:
     PRICING = {
         # GPT-4o models
         "gpt-4o": {
-            "input": 0.0025,  # per 1K tokens
-            "output": 0.01    # per 1K tokens
+            "input_per_1k": 0.0025,  # $0.0025 per 1k input tokens
+            "output_per_1k": 0.01,   # $0.01 per 1k output tokens
         },
         "gpt-4o-mini": {
-            "input": 0.00015,  # per 1K tokens
-            "output": 0.0006   # per 1K tokens
+            "input_per_1k": 0.000150,  # $0.00015 per 1k input tokens
+            "output_per_1k": 0.000600, # $0.0006 per 1k output tokens
+        },
+        
+        # GPT-5 models (estimated pricing - adjust when official pricing is available)
+        "gpt-5": {
+            "input_per_1k": 0.005,   # Estimated higher than GPT-4o
+            "output_per_1k": 0.02,   # Estimated higher than GPT-4o
         },
         # GPT-4 models
         "gpt-4": {

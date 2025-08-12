@@ -31,9 +31,20 @@ from openai_cost_tracker import cost_tracker
 # from robust_data_fetcher import RobustDataFetcher
 import numpy as np
 import shutil
+from concurrent.futures import ThreadPoolExecutor, as_completed
+
+# Default OpenAI model configurable via environment
+DEFAULT_OPENAI_MODEL = os.getenv('OPENAI_MODEL', 'gpt-5')
 
 # Import our fundamental scraper
 from fundamental_scraper import FundamentalDataCollector, FundamentalData
+
+# Import the enhanced screener extraction
+from enhanced_screener_extraction_v3 import EnhancedScreenerExtractionV3
+
+# Initialize the extractor
+api_key = os.getenv('OPENAI_API_KEY')
+extractor = EnhancedScreenerExtractionV3(api_key)
 
 # Enhanced Pydantic models for structured outputs
 class EnhancedTechnicalAnalysis(BaseModel):
@@ -511,8 +522,7 @@ class EnhancedTechnicalAnalysisAgent:
                             }
                         ]}
                 ],
-                max_tokens=1000,
-                temperature=0.3
+                max_completion_tokens=1000
             )
             
             print(f"DEBUG: OpenAI API call completed for {stock_data.ticker}")
@@ -806,7 +816,7 @@ Please respond in this exact JSON format:
             if hasattr(response, 'usage'):
                 usage = response.usage
                 cost_tracker.log_usage(
-                    model="gpt-4o-mini",
+                    model=os.getenv('OPENAI_MODEL', 'gpt-5'),
                     prompt_tokens=usage.prompt_tokens,
                     completion_tokens=usage.completion_tokens,
                     call_type="chat",
@@ -1717,6 +1727,9 @@ class EnhancedFundamentalAnalysisAgent:
         self.screenshots_dir = "screener_screenshots"
         os.makedirs(self.screenshots_dir, exist_ok=True)
         
+        # Initialize enhanced screener extractor
+        self.extractor = EnhancedScreenerExtractionV3(openai_api_key)
+        
         # Chrome options for Selenium
         self.chrome_options = Options()
         self.chrome_options.add_argument("--headless")
@@ -1727,1013 +1740,210 @@ class EnhancedFundamentalAnalysisAgent:
         self.chrome_options.add_argument("--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36")
     
     def analyze(self, stock_data: StockData) -> EnhancedFundamentalAnalysis:
-        """Analyze fundamental aspects using comprehensive approach with ArthaLens integration"""
+        """Analyze fundamental aspects using enhanced screener extraction"""
         try:
             print(f"💰 Enhanced Fundamental Analysis Agent analyzing {stock_data.ticker}...")
             
-            # Step 1: Capture complete page screenshot for Screener data
-            screenshot_path = self._capture_complete_page_screenshot(stock_data.ticker)
+            # Use the enhanced screener extraction
+            output_dir = "enhanced_screener_extraction_v3"
+            complete_data = self.extractor.extract_complete_data(stock_data.ticker, output_dir)
             
-            if not screenshot_path:
-                print(f"❌ Failed to capture complete page screenshot for {stock_data.ticker}")
-                return self._get_basic_fundamental_analysis(stock_data)
-            
-            # Step 2: Extract comprehensive data with OpenAI Vision
-            raw_data = self._analyze_screenshot_with_openai(screenshot_path, stock_data.ticker)
-            
-            if not raw_data:
-                print(f"❌ Failed to extract raw data for {stock_data.ticker}")
-                return self._get_basic_fundamental_analysis(stock_data)
-            
-            # Step 3: Apply fundamental analysis framework
-            analysis = self._apply_fundamental_analysis_framework(stock_data.ticker, raw_data)
-            
-            if analysis:
-                # Step 4: Extract ArthaLens data for correlation
-                arthalens_data = self._extract_arthalens_data(stock_data.ticker, analysis)
-                
-                # Step 5: Generate correlated insights
-                correlated_insights = self._generate_correlated_insights(
-                    stock_data.ticker, analysis, arthalens_data
-                )
-                
-                # Step 6: Convert analysis to EnhancedFundamentalAnalysis format with ArthaLens insights
-                return self._convert_analysis_to_enhanced_format(analysis, raw_data, arthalens_data, correlated_insights)
+            if complete_data:
+                # Process the extracted data
+                # Convert to EnhancedFundamentalAnalysis format
+                return self._convert_extracted_data_to_enhanced_format(complete_data)
             else:
-                print(f"❌ Failed to apply analysis framework for {stock_data.ticker}")
+                print(f"❌ Failed to extract data for {stock_data.ticker}")
                 return self._get_basic_fundamental_analysis(stock_data)
                 
         except Exception as e:
-            print(f"⚠️ Error in comprehensive fundamental analysis: {e}")
+            print(f"⚠️ Error in enhanced fundamental analysis: {e}")
             return self._get_basic_fundamental_analysis(stock_data)
     
-    def _capture_complete_page_screenshot(self, ticker: str) -> Optional[str]:
-        """Capture complete page screenshot for Screener.in with retry mechanism"""
-        try:
-            print(f"📸 Capturing complete page screenshot for {ticker}...")
-            
-            # Retry configuration
-            max_retries = 3
-            retry_delay = 5  # seconds
-            
-            for attempt in range(max_retries):
-                try:
-                    screenshot_path = self._capture_screener_screenshot_with_retry(ticker, attempt + 1)
-                    
-                    if screenshot_path and os.path.exists(screenshot_path):
-                        # Verify screenshot is not blank
-                        file_size = os.path.getsize(screenshot_path)
-                        if file_size > 100000:  # More than 100KB for Screener.in
-                            print(f"✅ Screener.in screenshot captured (attempt {attempt + 1}): {screenshot_path}")
-                            return screenshot_path
-                        else:
-                            print(f"⚠️ Screener.in screenshot too small ({file_size} bytes), retrying...")
-                            if attempt < max_retries - 1:
-                                time.sleep(retry_delay)
-                                continue
-                            else:
-                                print(f"❌ Failed to capture Screener.in screenshot after {max_retries} attempts")
-                                return None
-                    else:
-                        print(f"⚠️ Screener.in screenshot capture failed (attempt {attempt + 1}), retrying...")
-                        if attempt < max_retries - 1:
-                            time.sleep(retry_delay)
-                            continue
-                        else:
-                            print(f"❌ Failed to capture Screener.in screenshot after {max_retries} attempts")
-                            return None
-                            
-                except Exception as e:
-                    print(f"⚠️ Error capturing Screener.in screenshot (attempt {attempt + 1}): {e}")
-                    if attempt < max_retries - 1:
-                        time.sleep(retry_delay)
-                        continue
-                    else:
-                        print(f"❌ Failed to capture Screener.in screenshot after {max_retries} attempts")
-                        return None
-            
-            return None
-            
-        except Exception as e:
-            print(f"❌ Error in Screener.in screenshot capture: {e}")
-            return None
-    
-    def _capture_screener_screenshot_with_retry(self, ticker: str, attempt: int) -> Optional[str]:
-        """Capture Screener.in screenshot with retry mechanism and fresh browser session"""
-        try:
-            # Clean ticker for URL
-            clean_ticker = ticker.replace('.NS', '').replace('.BO', '')
-            
-            # Set up Chrome driver with better options for reliability
-            chrome_options = Options()
-            chrome_options.add_argument("--headless")
-            chrome_options.add_argument("--no-sandbox")
-            chrome_options.add_argument("--disable-dev-shm-usage")
-            chrome_options.add_argument("--disable-gpu")
-            chrome_options.add_argument("--window-size=1920,1080")
-            chrome_options.add_argument("--disable-web-security")
-            chrome_options.add_argument("--allow-running-insecure-content")
-            chrome_options.add_argument("--disable-features=VizDisplayCompositor")
-            chrome_options.add_argument("--disable-extensions")
-            chrome_options.add_argument("--disable-plugins")
-            chrome_options.add_argument("--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36")
-            
-            # Create fresh driver for each attempt
-            driver = None
+    def _convert_extracted_data_to_enhanced_format(self, extracted_data: Dict) -> EnhancedFundamentalAnalysis:
+        """Convert extracted data to EnhancedFundamentalAnalysis format"""
+        # Extract key metrics
+        key_metrics = extracted_data.get('key_metrics', {})
+        quarterly_results = extracted_data.get('quarterly_results', {})
+        annual_results = extracted_data.get('annual_results', {})
+        balance_sheet = extracted_data.get('balance_sheet', {})
+        cash_flows = extracted_data.get('cash_flows', {})
+        shareholding = extracted_data.get('shareholding', {})
+        
+        # Calculate comprehensive growth metrics
+        growth_metrics = self.calculate_comprehensive_growth_metrics(extracted_data)
+        growth_assessment = self._evaluate_growth_performance(growth_metrics)
+        
+        # Calculate metrics from extracted data
+        market_cap = key_metrics.get('market_cap', 'NA')
+        current_price = key_metrics.get('current_price', 'NA')
+        roce = key_metrics.get('roce', 'NA')
+        roe = key_metrics.get('roe', 'NA')
+        
+        # Use comprehensive growth metrics for revenue and profit growth
+        revenue_growth = "NA"
+        if growth_metrics['revenue']['yoy_growth'] is not None:
+            revenue_growth = self._format_growth_percentage(growth_metrics['revenue']['yoy_growth'])
+            # Add 3-year average context
+            if growth_metrics['revenue']['avg_yoy_3y'] is not None:
+                revenue_growth += f" (3Y Avg: {self._format_growth_percentage(growth_metrics['revenue']['avg_yoy_3y'])})"
+        
+        profit_growth = "NA"
+        if growth_metrics['net_profit']['yoy_growth'] is not None:
+            profit_growth = self._format_growth_percentage(growth_metrics['net_profit']['yoy_growth'])
+            # Add 3-year average context
+            if growth_metrics['net_profit']['avg_yoy_3y'] is not None:
+                profit_growth += f" (3Y Avg: {self._format_growth_percentage(growth_metrics['net_profit']['avg_yoy_3y'])})"
+        
+        # Calculate debt to equity from balance sheet
+        debt_to_equity = "NA"
+        if balance_sheet.get('total_liabilities') and balance_sheet.get('net_worth'):
             try:
-                driver = webdriver.Chrome(options=chrome_options)
-                driver.set_page_load_timeout(30)  # 30 second timeout
+                liabilities = float(balance_sheet['total_liabilities'].replace(',', ''))
+                net_worth = float(balance_sheet['net_worth'].replace(',', ''))
+                if net_worth > 0:
+                    de_ratio = liabilities / net_worth
+                    debt_to_equity = f"{de_ratio:.2f}"
+            except:
+                debt_to_equity = "NA"
+        
+        # Enhanced business quality assessment incorporating growth metrics
+        business_quality = "Can't Say"
+        if roce != 'NA' and roe != 'NA':
+            try:
+                roce_val = float(roce.replace('%', ''))
+                roe_val = float(roe.replace('%', ''))
+                growth_score = growth_assessment['overall_score']
                 
-                # Construct URL
-                url = f"https://www.screener.in/company/{clean_ticker}/"
+                # Factor in growth quality for business assessment
+                if roce_val > 15 and roe_val > 15 and growth_score >= 70:
+                    business_quality = "Excellent"
+                elif roce_val > 15 and roe_val > 10 and growth_score >= 50:
+                    business_quality = "High"
+                elif roce_val > 10 and roe_val > 10 and growth_score >= 45:
+                    business_quality = "Medium"
+                elif roce_val > 10 and roe_val > 10:
+                    business_quality = "Medium"
+                elif growth_score >= 60:  # Strong growth can offset moderate ratios
+                    business_quality = "Medium"
+                else:
+                    business_quality = "Low"
+            except:
+                if growth_assessment['overall_score'] >= 70:
+                    business_quality = "Medium"  # Growth-driven assessment
+                else:
+                    business_quality = "Can't Say"
+        elif growth_assessment['overall_score'] >= 70:
+            business_quality = "Medium"  # Pure growth-based assessment
+        
+        # Enhanced valuation assessment
+        valuation_status = "Fair"
+        if market_cap != 'NA':
+            try:
+                mc_val = float(market_cap.replace(',', ''))
+                growth_score = growth_assessment['overall_score']
                 
-                print(f"🌐 Loading Screener.in URL (attempt {attempt}): {url}")
-                
-                # Navigate to the page
-                driver.get(url)
-                
-                # Wait for page to load with longer timeout
-                time.sleep(10 + (attempt * 2))  # Longer wait for retry attempts
-                
-                # Check if page loaded correctly
-                page_title = driver.title
-                print(f"📄 Page title (attempt {attempt}): {page_title}")
-                
-                # Check for error pages
-                if "404" in page_title or "Not Found" in page_title or "Error" in page_title:
-                    print(f"❌ Page not found or error (attempt {attempt}): {page_title}")
-                    return None
-                
-                # Check if page has content
-                page_source = driver.page_source
-                if len(page_source) < 1000:
-                    print(f"❌ Page appears to be empty (attempt {attempt})")
-                    return None
-                
-                print(f"✅ Page loaded successfully (attempt {attempt}), content length: {len(page_source)} characters")
-                
-                # Get the total height of the page
-                total_height = driver.execute_script("return Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);")
-                print(f"📏 Total page height (attempt {attempt}): {total_height}px")
-                
-                if total_height == 0:
-                    print(f"❌ Page height is 0 (attempt {attempt})")
-                    return None
-                
-                # Enhanced scrolling to ensure all content is loaded
-                print(f"🔄 Scrolling through page to load all content (attempt {attempt})...")
-                
-                # Scroll down gradually to trigger lazy loading
-                current_height = 0
-                scroll_step = 1000  # Larger scroll steps for Screener.in
-                
-                while current_height < total_height:
-                    driver.execute_script(f"window.scrollTo(0, {current_height});")
-                    time.sleep(1 + (attempt * 0.5))  # Longer wait for retry attempts
-                    current_height += scroll_step
-                    
-                    # Check if height increased (dynamic content loading)
-                    new_height = driver.execute_script("return Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);")
-                    if new_height > total_height:
-                        total_height = new_height
-                        print(f"📏 Height increased to: {total_height}px")
-                
-                # Scroll back to top
-                driver.execute_script("window.scrollTo(0, 0);")
-                time.sleep(2)
-                
-                # Get the final page dimensions
-                final_height = driver.execute_script("return Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);")
-                final_width = driver.execute_script("return Math.max(document.body.scrollWidth, document.documentElement.scrollWidth);")
-                
-                print(f"📐 Final page dimensions (attempt {attempt}): {final_width}x{final_height}px")
-                
-                # Set window size to capture full page
-                driver.set_window_size(final_width, final_height)
-                time.sleep(2)
-                
-                # Take the screenshot
-                screenshot_path = f"{ticker}_complete_screener.png"
-                driver.save_screenshot(screenshot_path)
-                
-                print(f"✅ Screenshot saved (attempt {attempt}): {screenshot_path}")
-                print(f"📁 File size (attempt {attempt}): {os.path.getsize(screenshot_path) / (1024*1024):.2f} MB")
-                
-                # Verify screenshot is not blank
-                if os.path.getsize(screenshot_path) < 100000:  # Less than 100KB
-                    print(f"❌ Screenshot appears to be blank (attempt {attempt})")
-                    return None
-                
-                return screenshot_path
-                
-            finally:
-                # Always close the driver
-                if driver:
-                    try:
-                        driver.quit()
-                    except Exception as e:
-                        print(f"⚠️ Error closing driver (attempt {attempt}): {e}")
-            
-        except Exception as e:
-            print(f"❌ Error in Screener.in screenshot capture (attempt {attempt}): {e}")
-            return None
-    
-    def _analyze_screenshot_with_openai(self, screenshot_path: str, ticker: str) -> Optional[Dict]:
-        """Analyze screenshot with OpenAI Vision model using enhanced prompt with retry mechanism"""
-        try:
-            print(f"🤖 Analyzing complete page screenshot for {ticker} with enhanced analysis...")
-            
-            # Retry configuration
-            max_retries = 3
-            retry_delay = 10  # seconds
-            
-            for attempt in range(max_retries):
-                try:
-                    with open(screenshot_path, "rb") as image_file:
-                        image_data = base64.b64encode(image_file.read()).decode('utf-8')
-                    
-                    # Enhanced prompt for better data extraction
-                    enhanced_prompt = f"""
-You are an expert financial data analyst. Analyze this Screener.in page screenshot for {ticker} and extract ALL visible financial data in a structured JSON format.
-
-IMPORTANT INSTRUCTIONS:
-1. This is a COMPLETE page screenshot, so extract ALL visible data
-2. Look for tables, charts, and text containing financial information
-3. Extract numbers, percentages, and text exactly as they appear
-4. If you cannot read something clearly, use "Not Visible" but extract everything you can see
-5. Focus on the most recent quarters and key metrics
-
-EXTRACT THE FOLLOWING DATA:
-
-1. **Quarterly Results (Last 8 Quarters):**
-   - Revenue (in ₹ Crores)
-   - Net Profit (in ₹ Crores) 
-   - EBITDA (in ₹ Crores)
-   - Year-over-year growth rates
-   - Quarter-over-quarter growth rates
-
-2. **Key Financial Ratios:**
-   - ROE (Return on Equity) - percentage
-   - ROCE (Return on Capital Employed) - percentage
-   - Debt to Equity Ratio
-   - Current Ratio
-   - Operating Margin - percentage
-   - Net Margin - percentage
-
-3. **Valuation Metrics:**
-   - Market Cap (in ₹ Crores)
-   - Current Price (in ₹)
-   - Book Value (in ₹)
-   - PE Ratio
-   - PB Ratio
-   - EV/EBITDA
-
-4. **Shareholding Pattern:**
-   - Promoter Holding - percentage
-   - FII Holding - percentage
-   - DII Holding - percentage
-   - Retail Holding - percentage
-
-5. **Balance Sheet Data:**
-   - Total Assets (in ₹ Crores)
-   - Total Liabilities (in ₹ Crores)
-   - Net Worth (in ₹ Crores)
-   - Working Capital (in ₹ Crores)
-
-6. **Cash Flow Data:**
-   - Operating Cash Flow (in ₹ Crores)
-   - Investing Cash Flow (in ₹ Crores)
-   - Financing Cash Flow (in ₹ Crores)
-
-7. **Profit & Loss Data:**
-   - Total Revenue (in ₹ Crores)
-   - Total Expenses (in ₹ Crores)
-   - Operating Profit (in ₹ Crores)
-   - Net Profit (in ₹ Crores)
-
-RESPONSE FORMAT:
-Respond ONLY with a valid JSON object. Use this exact structure:
-
-{{
-  "quarterly_results": {{
-    "revenue": ["value1", "value2", ...],
-    "net_profit": ["value1", "value2", ...],
-    "ebitda": ["value1", "value2", ...]
-  }},
-  "ratios": {{
-    "roe": "value",
-    "roce": "value",
-    "debt_to_equity": "value",
-    "current_ratio": "value",
-    "operating_margin": "value",
-    "net_margin": "value"
-  }},
-  "valuation": {{
-    "market_cap": "value",
-    "current_price": "value",
-    "book_value": "value",
-    "pe_ratio": "value",
-    "pb_ratio": "value",
-    "ev_ebitda": "value"
-  }},
-  "shareholding": {{
-    "promoter_holding": "value",
-    "fii_holding": "value",
-    "dii_holding": "value",
-    "retail_holding": "value"
-  }},
-  "balance_sheet": {{
-    "total_assets": "value",
-    "total_liabilities": "value",
-    "net_worth": "value",
-    "working_capital": "value"
-  }},
-  "cash_flows": {{
-    "operating_cf": "value",
-    "investing_cf": "value",
-    "financing_cf": "value"
-  }},
-  "profit_loss": {{
-    "total_revenue": "value",
-    "total_expenses": "value",
-    "operating_profit": "value",
-    "net_profit": "value"
-  }}
-}}
-
-If you cannot extract any data, return an empty JSON object {{}}.
-"""
-                    
-                    # Call OpenAI with enhanced prompt
-                    response = self.llm.invoke([
-                        {"role": "user", "content": [
-                            {"type": "text", "text": enhanced_prompt},
-                            {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{image_data}"}}
-                        ]}
-                    ])
-                    
-                    # Log the API call
-                    self.cost_tracker.log_usage(
-                        prompt_tokens=len(enhanced_prompt.split()),
-                        completion_tokens=len(response.content.split()),
-                        model="gpt-4o-mini",
-                        call_type="gpt-4o-mini",
-                        description=f"Enhanced Screener data extraction for {ticker} (attempt {attempt + 1})",
-                        num_images=1
-                    )
-                    
-                    print(f"✅ Enhanced Screener data extraction successful (attempt {attempt + 1}) for {ticker}")
-                    
-                    # Parse the response
-                    import re
-                    
-                    response_text = response.content.strip()
-                    
-                    # Try to extract JSON from the response
-                    try:
-                        # First, try direct JSON parsing
-                        data = json.loads(response_text)
-                        
-                        # Check if we got meaningful data
-                        if self._has_meaningful_data(data):
-                            print(f"✅ Meaningful data extracted (attempt {attempt + 1})")
-                            return data
-                        else:
-                            print(f"⚠️ No meaningful data extracted (attempt {attempt + 1}), retrying...")
-                            if attempt < max_retries - 1:
-                                time.sleep(retry_delay)
-                                continue
-                            else:
-                                print(f"❌ Failed to extract meaningful data after {max_retries} attempts")
-                                return self._extract_data_manually(response_text, ticker)
-                                
-                    except json.JSONDecodeError:
-                        # If that fails, try to extract JSON using regex
-                        json_match = re.search(r'\{.*\}', response_text, re.DOTALL)
-                        if json_match:
-                            try:
-                                json_str = json_match.group(0)
-                                data = json.loads(json_str)
-                                
-                                # Check if we got meaningful data
-                                if self._has_meaningful_data(data):
-                                    print(f"✅ Meaningful data extracted via regex (attempt {attempt + 1})")
-                                    return data
-                                else:
-                                    print(f"⚠️ No meaningful data extracted via regex (attempt {attempt + 1}), retrying...")
-                                    if attempt < max_retries - 1:
-                                        time.sleep(retry_delay)
-                                        continue
-                                    else:
-                                        print(f"❌ Failed to extract meaningful data after {max_retries} attempts")
-                                        return self._extract_data_manually(response_text, ticker)
-                            except json.JSONDecodeError:
-                                pass
-                        
-                        # If all else fails, use manual extraction
-                        print(f"❌ JSON parsing failed (attempt {attempt + 1}): {response_text[:200]}...")
-                        if attempt < max_retries - 1:
-                            time.sleep(retry_delay)
-                            continue
-                        else:
-                            return self._extract_data_manually(response_text, ticker)
-                            
-                except Exception as e:
-                    print(f"❌ Error in enhanced screenshot analysis (attempt {attempt + 1}): {e}")
-                    if attempt < max_retries - 1:
-                        time.sleep(retry_delay)
-                        continue
+                # Adjust valuation based on growth quality
+                if mc_val > 50000:  # Large cap
+                    if growth_score >= 70:
+                        valuation_status = "Fair"  # Growth justifies large cap
                     else:
-                        print(f"❌ Failed to extract data after {max_retries} attempts")
-                        return None
-                        
-        except Exception as e:
-            print(f"❌ Error in enhanced screenshot analysis: {e}")
-            return None
-    
-    def _has_meaningful_data(self, data: Dict) -> bool:
-        """Check if the extracted data has meaningful content"""
-        if not data:
-            return False
+                        valuation_status = "Expensive"
+                elif mc_val > 10000:  # Mid cap
+                    if growth_score >= 60:
+                        valuation_status = "Attractive"
+                    else:
+                        valuation_status = "Fair"
+                else:  # Small cap
+                    if growth_score >= 50:
+                        valuation_status = "Attractive"
+                    else:
+                        valuation_status = "Cheap"
+            except:
+                valuation_status = "Fair"
         
-        # Check if any section has meaningful data
-        for section_name, section_data in data.items():
-            if isinstance(section_data, dict):
-                for key, value in section_data.items():
-                    if value and value not in ["", ",", "Not Visible", "N/A", "NA"]:
-                        if isinstance(value, list):
-                            for item in value:
-                                if item and item not in ["", ",", "Not Visible", "N/A", "NA"]:
-                                    return True
-                        else:
-                            return True
-            elif isinstance(section_data, list):
-                for item in section_data:
-                    if item and item not in ["", ",", "Not Visible", "N/A", "NA"]:
-                        return True
-            elif section_data and section_data not in ["", ",", "Not Visible", "N/A", "NA"]:
-                return True
+        # Calculate fair value estimate (basic approach)
+        fair_value = current_price if current_price != 'NA' else "NA"
         
-        return False
-    
-    def _extract_data_manually(self, response_content: str, ticker: str) -> Dict:
-        """Manually extract data from OpenAI response if JSON parsing fails"""
-        try:
-            # Create a basic structure for manual extraction
-            raw_data = {
-                "quarterly_results": {},
-                "profit_loss": {},
-                "balance_sheet": {},
-                "cash_flows": {},
-                "shareholding": {},
-                "ratios": {},
-                "valuation": {}
-            }
-            
-            # Extract key metrics using regex patterns
-            import re
-            
-            # Extract revenue patterns
-            revenue_pattern = r"revenue[:\s]*([\d,]+\.?\d*)"
-            revenue_match = re.search(revenue_pattern, response_content.lower())
-            if revenue_match:
-                raw_data["quarterly_results"]["revenue"] = revenue_match.group(1)
-            
-            # Extract profit patterns
-            profit_pattern = r"net\s*profit[:\s]*([\d,]+\.?\d*)"
-            profit_match = re.search(profit_pattern, response_content.lower())
-            if profit_match:
-                raw_data["quarterly_results"]["net_profit"] = profit_match.group(1)
-            
-            # Extract ROE patterns
-            roe_pattern = r"roe[:\s]*([\d,]+\.?\d*)"
-            roe_match = re.search(roe_pattern, response_content.lower())
-            if roe_match:
-                raw_data["ratios"]["roe"] = roe_match.group(1)
-            
-            # Extract debt patterns
-            debt_pattern = r"debt[:\s]*([\d,]+\.?\d*)"
-            debt_match = re.search(debt_pattern, response_content.lower())
-            if debt_match:
-                raw_data["balance_sheet"]["debt"] = debt_match.group(1)
-            
-            print(f"✅ Manual data extraction completed for {ticker}")
-            return raw_data
-            
-        except Exception as e:
-            print(f"❌ Manual extraction failed for {ticker}: {e}")
-            return {"error": f"Data extraction failed: {e}"}
-    
-    def _apply_fundamental_analysis_framework(self, ticker: str, raw_data: Dict) -> Optional[Dict]:
-        """Apply the sophisticated fundamental analysis framework"""
-        try:
-            print(f"🧠 Applying fundamental analysis framework for {ticker}...")
-            
-            # Prepare analysis prompt
-            analysis_prompt = f"""
-            You are a financial analysis expert. Evaluate {ticker}'s fundamental strength using this framework:
+        # Enhanced multibagger potential assessment
+        multibagger_potential = "Moderate"
+        if (growth_assessment['growth_quality'] == 'Excellent' and 
+            business_quality in ["Excellent", "High"]):
+            multibagger_potential = "High"
+        elif (growth_assessment['growth_quality'] == 'Good' and 
+              business_quality in ["High", "Medium"]):
+            multibagger_potential = "High"
+        elif growth_assessment['growth_quality'] == 'Good':
+            multibagger_potential = "Moderate"
+        elif growth_assessment['growth_quality'] == 'Poor':
+            multibagger_potential = "Low"
+        
+        # Enhanced fundamental reasons incorporating growth analysis
+        fundamental_reasons = f"""Growth Analysis: {growth_assessment['growth_quality']} growth quality (Score: {growth_assessment['overall_score']}/100).
+        
+Growth Highlights:
+{chr(10).join(['• ' + summary for summary in growth_assessment['growth_summary'][:5]])}
 
-            📘 ANALYSIS FRAMEWORK:
-            
-            🧱 Core Philosophy:
-            - A technical strategy is meaningless if applied to a fundamentally weak company
-            - Prioritize companies with consistent revenue, PAT, and ROCE growth
-            - Focus on future growth potential, capital efficiency, and financial resilience
-            
-            ✅ METRICS ANALYSIS:
-            
-            1. Market Capitalization:
-            - Compare with peers to judge growth headroom
-            - Small market cap with strong brand vs large peer = potential multibagger
-            
-            2. Quarterly Results (YoY):
-            - Compare revenue and PAT with same quarter last year
-            - Highlight abnormalities in "other income" and tax rates
-            - Ignore one bad quarter unless trend is deteriorating
-            
-            3. Return on Capital Employed (ROCE):
-            - ROCE > 30% → 🟢 Excellent
-            - ROCE > 20% → 🟡 Very Good
-            - ROCE < 20% → 🔴 Avoid for trades
-            
-            4. Debt-to-Equity Ratio (D/E):
-            - < 10% → 🟢 Best
-            - 10–25% → 🟡 Good
-            - > 25% → 🔴 Avoid
-            - Exceptions: Banking, NBFC, and stockbrokers (debt is inventory)
-            
-            5. Capital Work in Progress (CWIP):
-            - Indicates future growth capacity
-            - High CWIP = expansion story in motion
-            
-            6. Book Value vs Share Price:
-            - If price < book value → 🔍 Undervalued
-            - If price > book value → 🟢 Acceptable (indicates brand value)
-            
-            7. Cash Flow:
-            - Consider Net Profit + Depreciation as effective cash flow
-            
-            8. Promoter Holding Quality:
-            - Prefer stocks where "strong hands" (Promoters, FIIs, DIIs, HNIs) hold majority
-            - Avoid stocks where retail (weak hands) > 30%
-            
-            9. Pledging Risk:
-            - If (Promoter Holding %) × (Pledging %) > 10% → ⚠️ Avoid
-            
-            🚫 METRICS TO IGNORE:
-            - PE Ratio: Not reliable
-            - ROE: Only use if Banking/NBFC. Threshold: ROE > 10%
-            - Dividend Yield: Not relevant for growth-oriented trading
-            
-            RAW DATA FOR ANALYSIS:
-            {json.dumps(raw_data, indent=2)}
-            
-            Provide analysis in this exact format:
-            {{
-                "company_name": "{ticker}",
-                "ticker": "{ticker}",
-                "financial_summary": {{
-                    "market_cap": "₹X Cr",
-                    "revenue_yoy": "₹X Cr → ₹Y Cr",
-                    "pat_yoy": "₹X Cr → ₹Y Cr",
-                    "roce": "X% → Excellent/Very Good/Poor",
-                    "de_ratio": "X → Best/Good/High Risk",
-                    "cwip": "₹X Cr → Interpretation",
-                    "book_value": "₹X",
-                    "share_price": "₹Y",
-                    "valuation": "Undervalued/Fair/Brand Premium",
-                    "effective_cash_flow": "₹X Cr",
-                    "retail_holding": "X% → Acceptable/Weak Hands Dominant",
-                    "promoter_pledging_risk": "X% × Y% = Z → OK/Red Flag"
-                }},
-                "interpretation": {{
-                    "strengths": ["list key drivers"],
-                    "red_flags": ["list any weaknesses"],
-                    "eligibility_for_trading": "✅ Yes / ❌ No",
-                    "financial_verdict": "Strong Buy / Watchlist / Avoid",
-                    "confidence_level": "Strong/Medium/Low/Can't Say"
-                }},
-                "trend_analysis": {{
-                    "revenue_trend": "description of 8-quarter trend",
-                    "pat_trend": "description of 8-quarter trend",
-                    "roce_trend": "description of 4-year trend",
-                    "debt_trend": "description of 4-year trend",
-                    "cash_flow_trend": "description of 4-year trend"
-                }}
-            }}
-            
-            IMPORTANT: Only return the JSON, no other text.
-            """
-            
-            # Call OpenAI for analysis
-            response = self.openai_client.chat.completions.create(
-                model="gpt-4o-mini",
-                messages=[
-                    {
-                        "role": "user",
-                        "content": analysis_prompt
-                    }
-                ],
-                max_tokens=2000,
-                temperature=0
-            )
-            
-            # Track the API call usage
-            if hasattr(response, 'usage'):
-                usage = response.usage
-                cost_tracker.log_usage(
-                    model="gpt-4o-mini",
-                    prompt_tokens=usage.prompt_tokens,
-                    completion_tokens=usage.completion_tokens,
-                    call_type="chat",
-                    description=f"Fundamental analysis for {ticker}"
-                )
-            
-            # Extract JSON from response
-            response_text = response.choices[0].message.content.strip()
-            
-            # Find JSON in response
-            json_match = re.search(r'\{.*\}', response_text, re.DOTALL)
-            if json_match:
-                json_str = json_match.group()
-                analysis = json.loads(json_str)
-                print(f"✅ Fundamental analysis completed for {ticker}")
-                return analysis
-            else:
-                print(f"⚠️ No JSON found in analysis response for {ticker}")
-                return None
-                
-        except Exception as e:
-            print(f"❌ Error in fundamental analysis for {ticker}: {e}")
-            return None
-    
-    def _extract_arthalens_data(self, ticker: str, fundamental_analysis: Dict) -> Optional[Dict]:
-        """Extract ArthaLens data for correlation with fundamental analysis"""
-        try:
-            print(f"📊 Extracting ArthaLens data for {ticker}...")
-            
-            # Import ArthaLens extractor
-            from arthalens_extractor import ArthaLensExtractor
-            
-            extractor = ArthaLensExtractor()
-            
-            # Extract ArthaLens data with fundamental correlation
-            arthalens_data = extractor.extract_arthalens_data(ticker, fundamental_analysis)
-            
-            if arthalens_data and "error" not in arthalens_data:
-                print(f"✅ ArthaLens data extracted successfully for {ticker}")
-                return arthalens_data
-            else:
-                print(f"⚠️ Failed to extract ArthaLens data for {ticker}")
-                return None
-                
-        except Exception as e:
-            print(f"❌ Error extracting ArthaLens data: {e}")
-            return None
-    
-    def _generate_correlated_insights(self, ticker: str, fundamental_analysis: Dict, arthalens_data: Dict) -> Dict:
-        """Generate correlated insights with cost tracking"""
-        try:
-            # Create OpenAI client with stored API key
-            openai_client = OpenAI(api_key=self.openai_api_key)
-            
-            # Prepare correlation analysis prompt
-            correlation_prompt = f"""
-            Analyze the correlation between fundamental analysis and ArthaLens transcript/guidance data for {ticker}.
-            
-            FUNDAMENTAL ANALYSIS:
-            {json.dumps(fundamental_analysis, indent=2)}
-            
-            ARTHALENS DATA:
-            {json.dumps(arthalens_data, indent=2)}
-            
-            Provide a comprehensive correlation analysis that includes:
-            
-            1. **Trend Correlation Analysis:**
-               - Compare fundamental trends (revenue, profit, ROCE, debt) with management commentary
-               - Identify if management guidance aligns with fundamental performance
-               - Analyze if strategic initiatives are reflected in financial metrics
-            
-            2. **Growth Driver Analysis:**
-               - Identify key growth drivers mentioned in transcripts
-               - Correlate with fundamental growth metrics
-               - Assess if growth drivers are sustainable based on financial health
-            
-            3. **Risk Assessment:**
-               - Compare fundamental risks with management's risk discussion
-               - Identify any gaps between financial risks and management outlook
-               - Assess risk mitigation strategies mentioned
-            
-            4. **Strategic Alignment:**
-               - Evaluate if management strategy aligns with financial performance
-               - Assess if capital allocation matches strategic priorities
-               - Identify strategic initiatives that could impact future fundamentals
-            
-            5. **Confidence Indicators:**
-               - Identify positive/negative signals from correlation
-               - Assess management credibility based on past guidance accuracy
-               - Evaluate consistency between what management says and financial reality
-            
-            6. **Future Growth Confidence:**
-               - Assess confidence in future growth based on correlated data
-               - Identify key catalysts and risks for future performance
-               - Provide investment recommendation with reasoning
-            
-            Provide specific insights with supporting evidence from both datasets.
-            Focus on actionable insights for investment decision making.
-            """
-            
-            # Call OpenAI
-            response = openai_client.chat.completions.create(
-                model="gpt-4o-mini",
-                messages=[
-                    {
-                        "role": "user",
-                        "content": correlation_prompt
-                    }
-                ],
-                max_tokens=2000,
-                temperature=0
-            )
-            
-            # Track the API call usage
-            if hasattr(response, 'usage'):
-                usage = response.usage
-                cost_tracker.log_usage(
-                    model="gpt-4o-mini",
-                    prompt_tokens=usage.prompt_tokens,
-                    completion_tokens=usage.completion_tokens,
-                    call_type="chat",
-                    description=f"Correlated insights for {ticker}"
-                )
-            
-            correlated_insights = response.choices[0].message.content.strip()
-            
-            return {
-                "analysis": correlated_insights,
-                "generated_at": datetime.now().isoformat(),
-                "data_sources": ["fundamental_analysis", "arthalens_transcripts"]
-            }
-            
-        except Exception as e:
-            print(f"❌ Error generating correlated insights: {e}")
-            return {"error": str(e)}
-    
-    def _convert_analysis_to_enhanced_format(self, analysis: Dict, raw_data: Dict, arthalens_data: Optional[Dict] = None, correlated_insights: Optional[Dict] = None) -> EnhancedFundamentalAnalysis:
-        """Convert the comprehensive analysis to EnhancedFundamentalAnalysis format with ArthaLens integration"""
-        try:
-            fs = analysis.get('financial_summary', {})
-            interpretation = analysis.get('interpretation', {})
-            trends = analysis.get('trend_analysis', {})
-            
-            # Extract current metrics
-            current_metrics = raw_data.get('current_metrics', {})
-            shareholding = raw_data.get('shareholding', {})
-            
-            # Generate enhanced fundamental reasons with ArthaLens insights
-            fundamental_reasons = self._generate_enhanced_fundamental_reasons(
-                analysis, raw_data, arthalens_data, correlated_insights
-            )
-            
-            # Determine enhanced confidence level with ArthaLens correlation
-            enhanced_confidence = self._determine_enhanced_confidence(
-                interpretation.get('confidence_level', 'Medium'),
-                correlated_insights
-            )
-            
-            # Convert to EnhancedFundamentalAnalysis format
-            return EnhancedFundamentalAnalysis(
-                business_quality=self._determine_business_quality(enhanced_confidence),
-                market_penetration=self._analyze_market_penetration(current_metrics.get('market_cap'), raw_data),
-                pricing_power=self._analyze_pricing_power(current_metrics.get('roce'), current_metrics.get('debt_to_equity')),
-                revenue_growth=fs.get('revenue_yoy', 'Not Available'),
-                profit_growth=fs.get('pat_yoy', 'Not Available'),
-                debt_to_equity=fs.get('de_ratio', 'Not Available'),
-                roce_roe=fs.get('roce', 'Not Available'),
-                promoter_pledging=fs.get('promoter_pledging_risk', 'Not Available'),
-                retail_shareholding=fs.get('retail_holding', 'Not Available'),
-                valuation_status=fs.get('valuation', 'Not Available'),
-                fair_value=self._calculate_fair_value(current_metrics.get('current_price'), current_metrics.get('book_value'), current_metrics.get('roce')),
-                financial_health=self._assess_financial_health(current_metrics.get('roce'), current_metrics.get('debt_to_equity'), shareholding.get('retail_holding')),
-                multibagger_potential=self._assess_multibagger_potential(current_metrics.get('market_cap'), current_metrics.get('roce'), raw_data),
-                fundamental_reasons=fundamental_reasons,
-                confidence_score=enhanced_confidence
-            )
-            
-        except Exception as e:
-            print(f"❌ Error converting analysis format: {e}")
-            return self._get_basic_fundamental_analysis(StockData(ticker="", company_name="", sector=""))
-    
-    def _generate_enhanced_fundamental_reasons(self, analysis: Dict, raw_data: Dict, arthalens_data: Optional[Dict], correlated_insights: Optional[Dict]) -> str:
-        """Generate enhanced fundamental reasons with ArthaLens correlation"""
-        try:
-            interpretation = analysis.get('interpretation', {})
-            strengths = interpretation.get('strengths', [])
-            financial_summary = analysis.get('financial_summary', {})
-            
-            reasons = []
-            
-            # Add key strengths as reasons
-            for strength in strengths[:3]:  # Top 3 strengths
-                reasons.append(strength)
-            
-            # Add key metrics as reasons
-            if financial_summary.get('roce'):
-                reasons.append(f"ROCE: {financial_summary['roce']}")
-            
-            if financial_summary.get('de_ratio'):
-                reasons.append(f"Debt/Equity: {financial_summary['de_ratio']}")
-            
-            if financial_summary.get('valuation'):
-                reasons.append(f"Valuation: {financial_summary['valuation']}")
-            
-            # Add ArthaLens insights if available
-            if correlated_insights and "analysis" in correlated_insights:
-                # Extract key insights from correlation analysis
-                correlation_text = correlated_insights["analysis"]
-                
-                # Look for key positive signals
-                positive_signals = []
-                if "growth" in correlation_text.lower() and "positive" in correlation_text.lower():
-                    positive_signals.append("Management guidance aligns with growth trends")
-                if "strategic" in correlation_text.lower() and "alignment" in correlation_text.lower():
-                    positive_signals.append("Strategic initiatives supported by fundamentals")
-                if "credibility" in correlation_text.lower() and "high" in correlation_text.lower():
-                    positive_signals.append("High management credibility based on past performance")
-                
-                # Add top positive signals
-                for signal in positive_signals[:2]:
-                    reasons.append(signal)
-            
-            # Add ArthaLens specific insights
-            if arthalens_data:
-                if "guidance_data" in arthalens_data and arthalens_data["guidance_data"]:
-                    reasons.append("Strong forward-looking guidance from management")
-                if "summary_data" in arthalens_data and arthalens_data["summary_data"]:
-                    reasons.append("Positive management commentary on performance")
-            
-            return "; ".join(reasons) if reasons else "Strong fundamentals with consistent growth"
-            
-        except Exception as e:
-            print(f"❌ Error generating enhanced fundamental reasons: {e}")
-            return "Strong fundamentals with consistent growth"
-    
-    def _determine_enhanced_confidence(self, base_confidence: str, correlated_insights: Optional[Dict]) -> str:
-        """Determine enhanced confidence level with ArthaLens correlation"""
-        try:
-            if not correlated_insights or "analysis" not in correlated_insights:
-                return base_confidence
-            
-            correlation_text = correlated_insights["analysis"].lower()
-            
-            # Analyze correlation for confidence adjustment
-            positive_indicators = [
-                "positive correlation", "strong alignment", "high credibility",
-                "consistent performance", "sustainable growth", "strategic alignment"
-            ]
-            
-            negative_indicators = [
-                "negative correlation", "misalignment", "low credibility",
-                "inconsistent performance", "unsustainable", "strategic misalignment"
-            ]
-            
-            positive_count = sum(1 for indicator in positive_indicators if indicator in correlation_text)
-            negative_count = sum(1 for indicator in negative_indicators if indicator in correlation_text)
-            
-            # Adjust confidence based on correlation
-            if positive_count > negative_count:
-                if base_confidence == "Medium":
-                    return "Strong"
-                elif base_confidence == "Low":
-                    return "Medium"
-            elif negative_count > positive_count:
-                if base_confidence == "Strong":
-                    return "Medium"
-                elif base_confidence == "Medium":
-                    return "Low"
-            
-            return base_confidence
-            
-        except Exception as e:
-            print(f"❌ Error determining enhanced confidence: {e}")
-            return base_confidence
-    
-    def _determine_business_quality(self, confidence_level: str) -> str:
-        """Determine business quality based on confidence level"""
-        if confidence_level == "Strong":
-            return "Strong"
-        elif confidence_level == "Medium":
-            return "Medium"
-        elif confidence_level == "Low":
-            return "Weak"
+Financial Metrics: Market Cap {market_cap}, ROCE {roce}, ROE {roe}, Revenue Growth {revenue_growth}, Profit Growth {profit_growth}
+
+Growth Metrics Detail:
+• Revenue YoY: {self._format_growth_percentage(growth_metrics['revenue']['yoy_growth'])}
+• Net Profit YoY: {self._format_growth_percentage(growth_metrics['net_profit']['yoy_growth'])}
+• Operating Profit YoY: {self._format_growth_percentage(growth_metrics['operating_profit']['yoy_growth'])}
+• Revenue 3Y Avg: {self._format_growth_percentage(growth_metrics['revenue']['avg_yoy_3y'])}
+• Profit 3Y Avg: {self._format_growth_percentage(growth_metrics['net_profit']['avg_yoy_3y'])}"""
+        
+        # Enhanced confidence score incorporating growth data quality
+        confidence_score = "Medium"
+        data_sections = sum([
+            1 if key_metrics else 0,
+            1 if quarterly_results else 0,
+            1 if annual_results else 0,
+            1 if balance_sheet else 0,
+            1 if cash_flows else 0,
+            1 if shareholding else 0
+        ])
+        
+        growth_data_quality = sum([
+            1 if growth_metrics['revenue']['yoy_growth'] is not None else 0,
+            1 if growth_metrics['net_profit']['yoy_growth'] is not None else 0,
+            1 if growth_metrics['operating_profit']['yoy_growth'] is not None else 0
+        ])
+        
+        if data_sections >= 5 and growth_data_quality >= 2:
+            confidence_score = "Strong"
+        elif data_sections >= 3 and growth_data_quality >= 1:
+            confidence_score = "Medium"
+        elif data_sections >= 2 or growth_data_quality >= 1:
+            confidence_score = "Medium"
         else:
-            return "Can't Say"
-    
-    def _analyze_market_penetration(self, market_cap: str, raw_data: Dict) -> str:
-        """Analyze market penetration based on market cap and revenue trends"""
-        try:
-            if market_cap and market_cap != "null":
-                # Extract numeric value from market cap
-                market_cap_value = float(re.findall(r'[\d.]+', str(market_cap))[0]) if re.findall(r'[\d.]+', str(market_cap)) else 0
-                
-                if market_cap_value > 50000:  # > 50,000 Cr
-                    return "Market Leader"
-                elif market_cap_value > 10000:  # > 10,000 Cr
-                    return "Established Player"
-                elif market_cap_value > 1000:  # > 1,000 Cr
-                    return "Growing Presence"
-                else:
-                    return "Emerging Player"
-            else:
-                return "Not Available"
-        except:
-            return "Not Available"
-    
-    def _analyze_pricing_power(self, roce: str, de_ratio: str) -> str:
-        """Analyze pricing power based on ROCE and debt levels"""
-        try:
-            if roce and roce != "null":
-                roce_value = float(re.findall(r'[\d.]+', str(roce))[0]) if re.findall(r'[\d.]+', str(roce)) else 0
-                
-                if roce_value > 30:
-                    return "Strong Pricing Power"
-                elif roce_value > 20:
-                    return "Moderate Pricing Power"
-                else:
-                    return "Limited Pricing Power"
-            else:
-                return "Not Available"
-        except:
-            return "Not Available"
-    
-    def _assess_valuation(self, pe_ratio: str, book_value: str) -> str:
-        """Assess valuation status based on P/E ratio"""
-        try:
-            if pe_ratio and pe_ratio != "NA" and pe_ratio != "null":
-                # Extract numeric value from P/E ratio
-                pe_val = float(re.findall(r'[\d.]+', str(pe_ratio))[0]) if re.findall(r'[\d.]+', str(pe_ratio)) else 0
-                
-                if pe_val < 15:
-                    return "Undervalued"
-                elif pe_val < 25:
-                    return "Fairly Valued"
-                else:
-                    return "Overvalued"
-            else:
-                return "Not Available"
-        except:
-            return "Not Available"
-    
-    def _assess_financial_health(self, roce: str, de_ratio: str, retail_holding: str) -> str:
-        """Assess overall financial health"""
-        try:
-            health_score = 0
-            
-            if roce and roce != "null":
-                roce_val = float(re.findall(r'[\d.]+', str(roce))[0]) if re.findall(r'[\d.]+', str(roce)) else 0
-                if roce_val > 20:
-                    health_score += 2
-                elif roce_val > 15:
-                    health_score += 1
-            
-            if de_ratio and de_ratio != "null":
-                de_val = float(re.findall(r'[\d.]+', str(de_ratio))[0]) if re.findall(r'[\d.]+', str(de_ratio)) else 0
-                if de_val < 25:
-                    health_score += 1
-            
-            if retail_holding and retail_holding != "null":
-                retail_val = float(re.findall(r'[\d.]+', str(retail_holding))[0]) if re.findall(r'[\d.]+', str(retail_holding)) else 0
-                if retail_val < 30:
-                    health_score += 1
-            
-            if health_score >= 3:
-                return "Excellent"
-            elif health_score >= 2:
-                return "Good"
-            elif health_score >= 1:
-                return "Fair"
-            else:
-                return "Poor"
-        except:
-            return "Not Available"
-    
-    def _assess_multibagger_potential(self, market_cap: str, roce: str, raw_data: Dict) -> str:
-        """Assess multibagger potential"""
-        try:
-            if market_cap and roce and market_cap != "null" and roce != "null":
-                market_cap_val = float(re.findall(r'[\d.]+', str(market_cap))[0]) if re.findall(r'[\d.]+', str(market_cap)) else 0
-                roce_val = float(re.findall(r'[\d.]+', str(roce))[0]) if re.findall(r'[\d.]+', str(roce)) else 0
-                
-                if market_cap_val < 10000 and roce_val > 25:  # Small cap with high ROCE
-                    return "High Potential"
-                elif market_cap_val < 50000 and roce_val > 20:
-                    return "Moderate Potential"
-                else:
-                    return "Limited Potential"
-            else:
-                return "Not Available"
-        except:
-            return "Not Available"
+            confidence_score = "Low"
+        
+        # Store growth metrics for later use by correlation agent
+        if not hasattr(self, 'latest_growth_metrics'):
+            self.latest_growth_metrics = {}
+        self.latest_growth_metrics[extracted_data.get('ticker', 'unknown')] = {
+            'growth_metrics': growth_metrics,
+            'growth_assessment': growth_assessment
+        }
+        
+        return EnhancedFundamentalAnalysis(
+            business_quality=business_quality,
+            market_penetration="Strong" if market_cap != 'NA' else "Not Available",
+            pricing_power="High" if roce != 'NA' and float(roce.replace('%', '')) > 15 else "Medium",
+            revenue_growth=revenue_growth,
+            profit_growth=profit_growth,
+            debt_to_equity=debt_to_equity,
+            roce_roe=f"ROCE: {roce}, ROE: {roe}",
+            promoter_pledging=shareholding.get('promoter_holding', 'NA'),
+            retail_shareholding=shareholding.get('retail_holding', 'NA'),
+            valuation_status=valuation_status,
+            fair_value=fair_value,
+            financial_health=growth_assessment['growth_quality'],  # Use growth quality as financial health
+            multibagger_potential=multibagger_potential,
+            fundamental_reasons=fundamental_reasons,
+            confidence_score=confidence_score
+        )
     
     def _get_basic_fundamental_analysis(self, stock_data: StockData) -> EnhancedFundamentalAnalysis:
         """Fallback to basic fundamental analysis"""
@@ -2754,6 +1964,263 @@ If you cannot extract any data, return an empty JSON object {{}}.
             fundamental_reasons="Insufficient data for comprehensive analysis",
             confidence_score="Can't Say"
         )
+    
+    def calculate_comprehensive_growth_metrics(self, extracted_data: Dict) -> Dict:
+        """Calculate comprehensive growth metrics from extracted quarterly and annual data"""
+        growth_metrics = {
+            'revenue': {
+                'yoy_growth': None,
+                'qoq_same_quarter': None,
+                'avg_qoq_4q': None,
+                'avg_yoy_3y': None
+            },
+            'net_profit': {
+                'yoy_growth': None,
+                'qoq_same_quarter': None,
+                'avg_qoq_4q': None,
+                'avg_yoy_3y': None
+            },
+            'operating_profit': {
+                'yoy_growth': None,
+                'qoq_same_quarter': None,
+                'avg_qoq_4q': None,
+                'avg_yoy_3y': None
+            }
+        }
+        
+        try:
+            # Calculate revenue growth
+            quarterly_revenue = extracted_data.get('quarterly_results', {}).get('revenue', [])
+            annual_revenue = extracted_data.get('annual_results', {}).get('total_revenue', None)
+            
+            if quarterly_revenue:
+                growth_metrics['revenue'] = self._calculate_metric_growth(
+                    quarterly_revenue, annual_revenue, 'revenue'
+                )
+            
+            # Calculate net profit growth
+            quarterly_net_profit = extracted_data.get('quarterly_results', {}).get('net_profit', [])
+            annual_net_profit = extracted_data.get('annual_results', {}).get('net_profit', None)
+            
+            if quarterly_net_profit:
+                growth_metrics['net_profit'] = self._calculate_metric_growth(
+                    quarterly_net_profit, annual_net_profit, 'net_profit'
+                )
+            
+            # Calculate operating profit growth (using EBITDA)
+            quarterly_ebitda = extracted_data.get('quarterly_results', {}).get('ebitda', [])
+            annual_ebitda = extracted_data.get('annual_results', {}).get('ebitda', None)
+            
+            if quarterly_ebitda:
+                growth_metrics['operating_profit'] = self._calculate_metric_growth(
+                    quarterly_ebitda, annual_ebitda, 'operating_profit'
+                )
+            
+            return growth_metrics
+            
+        except Exception as e:
+            print(f"Error calculating growth metrics: {e}")
+            return growth_metrics
+    
+    def _calculate_metric_growth(self, quarterly_data: List, annual_current: str, metric_name: str) -> Dict:
+        """Calculate growth metrics for a specific financial metric"""
+        metrics = {
+            'yoy_growth': None,
+            'qoq_same_quarter': None,
+            'avg_qoq_4q': None,
+            'avg_yoy_3y': None
+        }
+        
+        try:
+            # Convert quarterly data to numbers
+            quarterly_values = []
+            for q in quarterly_data[:8]:  # Last 8 quarters
+                try:
+                    # Clean the value (remove commas, convert to float)
+                    clean_value = str(q).replace(',', '').replace('₹', '').replace('Cr.', '').strip()
+                    if clean_value and clean_value != 'NA' and clean_value != '':
+                        quarterly_values.append(float(clean_value))
+                    else:
+                        quarterly_values.append(None)
+                except:
+                    quarterly_values.append(None)
+            
+            # Calculate Year-over-Year Growth (Q1 vs Q5 - same quarter last year)
+            if len(quarterly_values) >= 5 and quarterly_values[0] is not None and quarterly_values[4] is not None:
+                if quarterly_values[4] != 0:
+                    yoy_growth = ((quarterly_values[0] - quarterly_values[4]) / abs(quarterly_values[4])) * 100
+                    metrics['yoy_growth'] = round(yoy_growth, 2)
+            
+            # Calculate Quarter-over-Quarter Same Quarter Growth (Q1 vs Q5)
+            if len(quarterly_values) >= 5 and quarterly_values[0] is not None and quarterly_values[4] is not None:
+                if quarterly_values[4] != 0:
+                    qoq_same = ((quarterly_values[0] - quarterly_values[4]) / abs(quarterly_values[4])) * 100
+                    metrics['qoq_same_quarter'] = round(qoq_same, 2)
+            
+            # Calculate Average QoQ Growth for Last 4 Quarters
+            qoq_growths = []
+            for i in range(3):  # Q1 vs Q2, Q2 vs Q3, Q3 vs Q4
+                if (i + 1 < len(quarterly_values) and 
+                    quarterly_values[i] is not None and 
+                    quarterly_values[i + 1] is not None and 
+                    quarterly_values[i + 1] != 0):
+                    qoq = ((quarterly_values[i] - quarterly_values[i + 1]) / abs(quarterly_values[i + 1])) * 100
+                    qoq_growths.append(qoq)
+            
+            if qoq_growths:
+                metrics['avg_qoq_4q'] = round(sum(qoq_growths) / len(qoq_growths), 2)
+            
+            # Calculate Average YoY Growth from Last 3 Years (using quarterly data approach)
+            yoy_growths = []
+            for i in range(min(3, len(quarterly_values) - 4)):  # Last 3 year-over-year comparisons
+                current_q = quarterly_values[i]
+                previous_year_q = quarterly_values[i + 4]
+                
+                if current_q is not None and previous_year_q is not None and previous_year_q != 0:
+                    yoy = ((current_q - previous_year_q) / abs(previous_year_q)) * 100
+                    yoy_growths.append(yoy)
+            
+            if yoy_growths:
+                metrics['avg_yoy_3y'] = round(sum(yoy_growths) / len(yoy_growths), 2)
+            
+            return metrics
+            
+        except Exception as e:
+            print(f"Error calculating {metric_name} growth: {e}")
+            return metrics
+    
+    def _format_growth_percentage(self, value) -> str:
+        """Format growth percentage for display"""
+        if value is None:
+            return "N/A"
+        elif value > 0:
+            return f"+{value:.1f}%"
+        else:
+            return f"{value:.1f}%"
+    
+    def _evaluate_growth_performance(self, growth_metrics: Dict) -> Dict:
+        """Evaluate growth performance and return detailed assessment"""
+        growth_assessment = {
+            'overall_score': 0,
+            'revenue_score': 0,
+            'profit_score': 0,
+            'operating_score': 0,
+            'consistency_score': 0,
+            'growth_quality': 'Average',
+            'growth_summary': []
+        }
+        
+        try:
+            total_score = 0
+            score_count = 0
+            
+            # Revenue Growth Analysis
+            revenue = growth_metrics.get('revenue', {})
+            if revenue.get('yoy_growth') is not None:
+                yoy_rev = revenue['yoy_growth']
+                if yoy_rev > 20:
+                    growth_assessment['revenue_score'] = 85
+                    growth_assessment['growth_summary'].append(f"Excellent revenue growth of {self._format_growth_percentage(yoy_rev)} YoY")
+                elif yoy_rev > 10:
+                    growth_assessment['revenue_score'] = 70
+                    growth_assessment['growth_summary'].append(f"Strong revenue growth of {self._format_growth_percentage(yoy_rev)} YoY")
+                elif yoy_rev > 0:
+                    growth_assessment['revenue_score'] = 55
+                    growth_assessment['growth_summary'].append(f"Positive revenue growth of {self._format_growth_percentage(yoy_rev)} YoY")
+                elif yoy_rev < -10:
+                    growth_assessment['revenue_score'] = 20
+                    growth_assessment['growth_summary'].append(f"Declining revenue with {self._format_growth_percentage(yoy_rev)} YoY contraction")
+                else:
+                    growth_assessment['revenue_score'] = 35
+                    growth_assessment['growth_summary'].append(f"Revenue decline of {self._format_growth_percentage(yoy_rev)} YoY")
+                
+                total_score += growth_assessment['revenue_score']
+                score_count += 1
+            
+            # Net Profit Growth Analysis
+            net_profit = growth_metrics.get('net_profit', {})
+            if net_profit.get('yoy_growth') is not None:
+                yoy_profit = net_profit['yoy_growth']
+                if yoy_profit > 25:
+                    growth_assessment['profit_score'] = 90
+                    growth_assessment['growth_summary'].append(f"Outstanding net profit growth of {self._format_growth_percentage(yoy_profit)} YoY")
+                elif yoy_profit > 15:
+                    growth_assessment['profit_score'] = 75
+                    growth_assessment['growth_summary'].append(f"Strong net profit growth of {self._format_growth_percentage(yoy_profit)} YoY")
+                elif yoy_profit > 0:
+                    growth_assessment['profit_score'] = 60
+                    growth_assessment['growth_summary'].append(f"Positive net profit growth of {self._format_growth_percentage(yoy_profit)} YoY")
+                elif yoy_profit < -20:
+                    growth_assessment['profit_score'] = 15
+                    growth_assessment['growth_summary'].append(f"Severe profit decline of {self._format_growth_percentage(yoy_profit)} YoY")
+                else:
+                    growth_assessment['profit_score'] = 30
+                    growth_assessment['growth_summary'].append(f"Net profit decline of {self._format_growth_percentage(yoy_profit)} YoY")
+                
+                total_score += growth_assessment['profit_score']
+                score_count += 1
+            
+            # Operating Profit Growth Analysis
+            op_profit = growth_metrics.get('operating_profit', {})
+            if op_profit.get('yoy_growth') is not None:
+                yoy_op = op_profit['yoy_growth']
+                if yoy_op > 20:
+                    growth_assessment['operating_score'] = 80
+                    growth_assessment['growth_summary'].append(f"Strong operational improvement with {self._format_growth_percentage(yoy_op)} EBITDA growth")
+                elif yoy_op > 10:
+                    growth_assessment['operating_score'] = 65
+                    growth_assessment['growth_summary'].append(f"Good operational performance with {self._format_growth_percentage(yoy_op)} EBITDA growth")
+                elif yoy_op > 0:
+                    growth_assessment['operating_score'] = 55
+                elif yoy_op < -15:
+                    growth_assessment['operating_score'] = 20
+                    growth_assessment['growth_summary'].append(f"Operational deterioration with {self._format_growth_percentage(yoy_op)} EBITDA decline")
+                else:
+                    growth_assessment['operating_score'] = 35
+                    growth_assessment['growth_summary'].append(f"Declining operations with {self._format_growth_percentage(yoy_op)} EBITDA contraction")
+                
+                total_score += growth_assessment['operating_score']
+                score_count += 1
+            
+            # Consistency Analysis
+            consistency_scores = []
+            for metric_name in ['revenue', 'net_profit', 'operating_profit']:
+                metric_data = growth_metrics.get(metric_name, {})
+                if metric_data.get('avg_qoq_4q') is not None:
+                    avg_qoq = metric_data['avg_qoq_4q']
+                    if avg_qoq > 5:
+                        consistency_scores.append(75)
+                        growth_assessment['growth_summary'].append(f"Consistent {metric_name.replace('_', ' ')} growth averaging {self._format_growth_percentage(avg_qoq)} QoQ")
+                    elif avg_qoq > 0:
+                        consistency_scores.append(60)
+                    elif avg_qoq < -10:
+                        consistency_scores.append(25)
+                    else:
+                        consistency_scores.append(45)
+            
+            if consistency_scores:
+                growth_assessment['consistency_score'] = sum(consistency_scores) / len(consistency_scores)
+                total_score += growth_assessment['consistency_score']
+                score_count += 1
+            
+            # Calculate overall score
+            if score_count > 0:
+                growth_assessment['overall_score'] = int(total_score / score_count)
+                
+                # Determine growth quality
+                if growth_assessment['overall_score'] >= 75:
+                    growth_assessment['growth_quality'] = 'Excellent'
+                elif growth_assessment['overall_score'] >= 60:
+                    growth_assessment['growth_quality'] = 'Good'
+                elif growth_assessment['overall_score'] >= 45:
+                    growth_assessment['growth_quality'] = 'Average'
+                else:
+                    growth_assessment['growth_quality'] = 'Poor'
+            
+        except Exception as e:
+            print(f"Error evaluating growth performance: {e}")
+        
+        return growth_assessment
 
     def _create_comprehensive_analysis_context(self, stock_data: StockData, rhs_analysis: Optional[Dict] = None, cwh_analysis: Optional[Dict] = None) -> str:
         """Create comprehensive analysis context for OpenAI"""
@@ -2971,7 +2438,7 @@ class EnhancedMultiAgentStockAnalysis:
         self.openai_api_key = openai_api_key  # Store the API key
         self.openai_client = OpenAI(api_key=openai_api_key)
         # Initialize primary LLM with configurable model
-        self.llm = ChatOpenAI(openai_api_key=openai_api_key, model=DEFAULT_OPENAI_MODEL)
+        self.llm = ChatOpenAI(openai_api_key=openai_api_key, model=DEFAULT_OPENAI_MODEL, temperature=1)
         self.technical_agent = EnhancedTechnicalAnalysisAgent(self.llm, openai_api_key)
         self.fundamental_agent = EnhancedFundamentalAnalysisAgent(self.llm, openai_api_key)
         self.coordinator_agent = EnhancedCoordinatorAgent(self.llm)
@@ -4015,80 +3482,143 @@ ALL STRATEGY PERFORMANCE RANKING:
             if not arthalens_data:
                 return {"error": "No ArthaLens data available for correlation"}
             
+            # Get growth metrics from fundamental agent if available
+            growth_data = ""
+            if hasattr(self.fundamental_agent, 'latest_growth_metrics') and ticker in self.fundamental_agent.latest_growth_metrics:
+                growth_info = self.fundamental_agent.latest_growth_metrics[ticker]
+                growth_metrics = growth_info['growth_metrics']
+                growth_assessment = growth_info['growth_assessment']
+                
+                growth_data = f"""
+                
+COMPREHENSIVE GROWTH METRICS ANALYSIS:
+
+Growth Quality: {growth_assessment['growth_quality']} (Overall Score: {growth_assessment['overall_score']}/100)
+
+Revenue Growth Analysis:
+• YoY Growth: {self.fundamental_agent._format_growth_percentage(growth_metrics['revenue']['yoy_growth'])}
+• Same Quarter YoY: {self.fundamental_agent._format_growth_percentage(growth_metrics['revenue']['qoq_same_quarter'])}
+• 4Q Avg QoQ: {self.fundamental_agent._format_growth_percentage(growth_metrics['revenue']['avg_qoq_4q'])}
+• 3Y Avg YoY: {self.fundamental_agent._format_growth_percentage(growth_metrics['revenue']['avg_yoy_3y'])}
+
+Net Profit Growth Analysis:
+• YoY Growth: {self.fundamental_agent._format_growth_percentage(growth_metrics['net_profit']['yoy_growth'])}
+• Same Quarter YoY: {self.fundamental_agent._format_growth_percentage(growth_metrics['net_profit']['qoq_same_quarter'])}
+• 4Q Avg QoQ: {self.fundamental_agent._format_growth_percentage(growth_metrics['net_profit']['avg_qoq_4q'])}
+• 3Y Avg YoY: {self.fundamental_agent._format_growth_percentage(growth_metrics['net_profit']['avg_yoy_3y'])}
+
+Operating Profit (EBITDA) Growth Analysis:
+• YoY Growth: {self.fundamental_agent._format_growth_percentage(growth_metrics['operating_profit']['yoy_growth'])}
+• Same Quarter YoY: {self.fundamental_agent._format_growth_percentage(growth_metrics['operating_profit']['qoq_same_quarter'])}
+• 4Q Avg QoQ: {self.fundamental_agent._format_growth_percentage(growth_metrics['operating_profit']['avg_qoq_4q'])}
+• 3Y Avg YoY: {self.fundamental_agent._format_growth_percentage(growth_metrics['operating_profit']['avg_yoy_3y'])}
+
+Growth Performance Scores:
+• Revenue Score: {growth_assessment['revenue_score']}/100
+• Profit Score: {growth_assessment['profit_score']}/100
+• Operating Score: {growth_assessment['operating_score']}/100
+• Consistency Score: {growth_assessment['consistency_score']:.1f}/100
+
+Key Growth Insights:
+{chr(10).join(['• ' + summary for summary in growth_assessment['growth_summary']])}
+                """
+            
             # Prepare the comprehensive correlation analysis prompt
             correlation_prompt = f"""
-            Based on the fundamental analysis and ArthaLens transcript/guidance data for {ticker}, provide a comprehensive analysis with the following specific outputs:
+            Based on the fundamental analysis, detailed growth metrics, and ArthaLens transcript/guidance data for {ticker}, provide a comprehensive analysis with the following specific outputs:
             
             FUNDAMENTAL ANALYSIS:
             {fundamental_analysis.model_dump() if hasattr(fundamental_analysis, 'model_dump') else str(fundamental_analysis)}
+            {growth_data}
             
             ARTHALENS DATA:
             {json.dumps(arthalens_data, indent=2)}
             
             Please provide the following specific outputs:
             
-            1. **CONFIDENCE ON GROWTH OF THE COMPANY:**
+            1. **GROWTH METRICS CORRELATION WITH MANAGEMENT COMMENTARY:**
+               - How do the calculated YoY, QoQ, and 3-year average growth rates align with management guidance?
+               - Are the actual growth trends consistent with management's narrative?
+               - Which growth metrics (revenue, profit, operating) show the strongest correlation with management expectations?
+            
+            2. **GROWTH CONSISTENCY AND QUALITY ASSESSMENT:**
+               - Analysis of growth consistency across revenue, net profit, and operating profit
+               - Assessment of quarter-over-quarter growth volatility
+               - Evaluation of 3-year average trends vs recent performance
+               - Growth quality score interpretation and implications
+            
+            3. **CONFIDENCE ON GROWTH OF THE COMPANY:**
                - Overall confidence level (High/Medium/Low with percentage)
-               - Reasoning based on management commentary and fundamental alignment
+               - Reasoning based on actual growth metrics alignment with management commentary
+               - Impact of growth consistency on confidence level
             
-            2. **VALUATION ASSESSMENT:**
+            4. **VALUATION ASSESSMENT WITH GROWTH CONTEXT:**
                - Current valuation status (Overvalued/Fair/Undervalued)
-               - Basis: Recent narrative and past trends
-               - Key valuation drivers
+               - How do actual growth rates justify current valuation?
+               - Growth-adjusted fair value assessment
+               - Key valuation drivers considering growth quality
             
-            3. **CURRENT GROWTH/DEGROWTH METRICS (Top 5 Most Important Points):**
-               - List the 5 most critical current performance indicators
-               - Include both positive and negative trends
-               - Focus on revenue, profit, margins, market share, operational efficiency
+            5. **CURRENT GROWTH/DEGROWTH METRICS (Top 5 Most Important Points):**
+               - List the 5 most critical current performance indicators from actual data
+               - Include specific growth percentages and trends
+               - Focus on revenue, profit, margins, operational efficiency with actual numbers
+               - Highlight any divergence between metrics
             
-            4. **FUTURE GROWTH/DEGROWTH DRIVERS (Top 5 Most Important Points):**
+            6. **FUTURE GROWTH/DEGROWTH DRIVERS (Top 5 Most Important Points):**
                - List the 5 most critical future growth or risk factors
-               - Include strategic initiatives, market opportunities, risks
-               - Focus on management guidance and strategic execution
+               - How do current growth trends support or challenge future projections?
+               - Include strategic initiatives, market opportunities, risks from management guidance
+               - Focus on management guidance vs current growth trajectory alignment
             
-            5. **FUNDAMENTAL METRICS CORRELATION ANALYSIS:**
-               - Revenue Growth Trends vs Management Commentary
-               - Profit Margin Evolution vs Strategic Initiatives
-               - Market Share Dynamics vs Competitive Positioning
-               - Operational Efficiency vs Management Execution
-               - Debt Management vs Capital Allocation Strategy
-               - Cash Flow Generation vs Investment Plans
+            7. **FUNDAMENTAL METRICS CORRELATION ANALYSIS:**
+               - Revenue Growth Trends vs Management Commentary (with specific percentages)
+               - Profit Margin Evolution vs Strategic Initiatives (using actual growth data)
+               - Operational Efficiency trends vs Management Execution (EBITDA growth analysis)
+               - Growth Consistency vs Management Confidence
+               - Cash Flow Generation implications from profit growth trends
+               - Debt Management capabilities given current profitability trends
             
-            6. **PROJECTED GROWTH ANALYSIS:**
-               - Revenue Growth Projections (Next 2-3 years)
-               - Profit Margin Expansion/Contraction Expectations
-               - Market Share Growth Potential
-               - Operational Efficiency Improvements
-               - Key Growth Catalysts and Timeline
-               - Risk Factors Affecting Projections
+            8. **PROJECTED GROWTH ANALYSIS WITH DATA FOUNDATION:**
+               - Revenue Growth Projections based on current 3-year averages and recent trends
+               - Profit Margin Expansion/Contraction based on operating leverage analysis
+               - Operational Efficiency Improvements supported by current EBITDA trends
+               - Growth sustainability assessment using consistency scores
+               - Risk Factors based on growth volatility and management guidance gaps
             
-            7. **KEY INSIGHTS SUMMARY:**
-               - Most important correlation between fundamentals and management commentary
-               - Critical risk factors or opportunities
-               - Investment recommendation reasoning
+            9. **GROWTH-ADJUSTED INVESTMENT RECOMMENDATION:**
+               - Investment recommendation considering actual growth quality score
+               - Specific growth metrics that support or contradict the recommendation
+               - Timeline and milestones based on growth trajectory analysis
+               - Position sizing implications based on growth consistency
             
-            Provide clear, actionable insights with specific evidence from both datasets.
-            Focus on the most important factors that would influence investment decisions.
-            Include specific numbers, percentages, and timelines where possible.
+            10. **KEY INSIGHTS SUMMARY:**
+                - Most important correlation between actual growth metrics and management commentary
+                - Critical growth-related risk factors or opportunities
+                - Growth quality impact on investment thesis
+                - Specific growth targets to monitor for validation
+            
+            Provide clear, actionable insights with specific evidence from actual growth calculations and management data.
+            Focus on the correlation between calculated growth metrics and management guidance.
+            Include specific numbers, percentages, growth rates, and timelines where possible.
+            Highlight any significant discrepancies between actual performance and management narrative.
             """
             
             response = self.openai_client.chat.completions.create(
-                model="gpt-4o-mini",
+                model=os.getenv('OPENAI_MODEL', 'gpt-5'),
                 messages=[
                     {
                         "role": "user",
                         "content": correlation_prompt
                     }
                 ],
-                max_tokens=2000,
-                temperature=0
+                max_completion_tokens=2000
             )
             
             # Track the API call usage
             if hasattr(response, 'usage'):
                 usage = response.usage
                 self.cost_tracker.log_usage(
-                    model="gpt-4o-mini",
+                    model=os.getenv('OPENAI_MODEL', 'gpt-5'),
                     prompt_tokens=usage.prompt_tokens,
                     completion_tokens=usage.completion_tokens,
                     call_type="chat",
@@ -4655,150 +4185,130 @@ The analysis provides a holistic view of {ticker} considering both quantitative 
                 'collection_timestamp': timestamp
             }
             
-            # 0. Enhanced Fundamental Data Collection (NEW)
-            print(f"🚀 0. Enhanced Fundamental Data Collection for {ticker}...")
-            try:
-                # Initialize enhanced fundamental data collector
-                from fundamental_scraper import FundamentalDataCollector
-                enhanced_collector = FundamentalDataCollector(openai_api_key=self.openai_api_key)
-                print(f"✅ Enhanced collector initialized")
-                
-                # Collect enhanced fundamental data
-                print(f"🔍 Collecting enhanced fundamental data...")
-                enhanced_fundamental_data = enhanced_collector.collect_fundamental_data(
-                    ticker, stock_data.company_name, stock_data.sector
-                )
-                
-                if enhanced_fundamental_data:
-                    print(f"✅ Enhanced data collected successfully")
-                    collected_data['enhanced_fundamental_data'] = enhanced_fundamental_data
-                    
-                    # Save enhanced data to file
-                    enhanced_data_file = os.path.join(enhanced_data_dir, "enhanced_fundamental_data.json")
-                    with open(enhanced_data_file, 'w') as f:
-                        # Convert dataclass to dict for JSON serialization
+            # Define parallel tasks
+            def task_enhanced_fundamental():
+                try:
+                    from fundamental_scraper import FundamentalDataCollector
+                    enhanced_collector = FundamentalDataCollector(openai_api_key=self.openai_api_key)
+                    data = enhanced_collector.collect_fundamental_data(ticker, stock_data.company_name, stock_data.sector)
+                    if data:
+                        enhanced_data_file = os.path.join(enhanced_data_dir, "enhanced_fundamental_data.json")
                         enhanced_data_dict = {
-                            'ticker': enhanced_fundamental_data.ticker,
-                            'company_name': enhanced_fundamental_data.company_name,
-                            'sector': enhanced_fundamental_data.sector,
-                            'market_cap': enhanced_fundamental_data.market_cap,
-                            'pe_ratio': enhanced_fundamental_data.pe_ratio,
-                            'book_value': enhanced_fundamental_data.book_value,
-                            'roce': enhanced_fundamental_data.roce,
-                            'roe': enhanced_fundamental_data.roe,
-                            'quarterly_column_headers': enhanced_fundamental_data.quarterly_column_headers,
-                            'quarterly_revenue': enhanced_fundamental_data.quarterly_revenue,
-                            'quarterly_expenses': enhanced_fundamental_data.quarterly_expenses,
-                            'quarterly_operating_profit': enhanced_fundamental_data.quarterly_operating_profit,
-                            'quarterly_net_profit': enhanced_fundamental_data.quarterly_net_profit,
-                            'quarterly_ebitda': enhanced_fundamental_data.quarterly_ebitda,
-                            'annual_column_headers': enhanced_fundamental_data.annual_column_headers,
-                            'annual_total_revenue': enhanced_fundamental_data.annual_total_revenue,
-                            'annual_total_expenses': enhanced_fundamental_data.annual_total_expenses,
-                            'annual_operating_profit': enhanced_fundamental_data.annual_operating_profit,
-                            'annual_net_profit': enhanced_fundamental_data.annual_net_profit,
-                            'annual_ebitda': enhanced_fundamental_data.annual_ebitda,
-                            'total_assets': enhanced_fundamental_data.total_assets,
-                            'total_liabilities': enhanced_fundamental_data.total_liabilities,
-                            'net_worth': enhanced_fundamental_data.net_worth,
-                            'working_capital': enhanced_fundamental_data.working_capital,
-                            'operating_cf': enhanced_fundamental_data.operating_cf,
-                            'investing_cf': enhanced_fundamental_data.investing_cf,
-                            'financing_cf': enhanced_fundamental_data.financing_cf,
-                            'promoter_holding': enhanced_fundamental_data.promoter_holding,
-                            'fii_shareholding': enhanced_fundamental_data.fii_shareholding,
-                            'dii_shareholding': enhanced_fundamental_data.dii_shareholding,
-                            'retail_shareholding': enhanced_fundamental_data.retail_shareholding
+                            'ticker': data.ticker,
+                            'company_name': data.company_name,
+                            'sector': data.sector,
+                            'market_cap': data.market_cap,
+                            'pe_ratio': data.pe_ratio,
+                            'book_value': data.book_value,
+                            'roce': data.roce,
+                            'roe': data.roe,
+                            'quarterly_column_headers': data.quarterly_column_headers,
+                            'quarterly_revenue': data.quarterly_revenue,
+                            'quarterly_expenses': data.quarterly_expenses,
+                            'quarterly_operating_profit': data.quarterly_operating_profit,
+                            'quarterly_net_profit': data.quarterly_net_profit,
+                            'quarterly_ebitda': data.quarterly_ebitda,
+                            'annual_column_headers': data.annual_column_headers,
+                            'annual_total_revenue': data.annual_total_revenue,
+                            'annual_total_expenses': data.annual_total_expenses,
+                            'annual_operating_profit': data.annual_operating_profit,
+                            'annual_net_profit': data.annual_net_profit,
+                            'annual_ebitda': data.annual_ebitda,
+                            'total_assets': data.total_assets,
+                            'total_liabilities': data.total_liabilities,
+                            'net_worth': data.net_worth,
+                            'working_capital': data.working_capital,
+                            'operating_cf': data.operating_cf,
+                            'investing_cf': data.investing_cf,
+                            'financing_cf': data.financing_cf,
+                            'promoter_holding': data.promoter_holding,
+                            'fii_shareholding': data.fii_shareholding,
+                            'dii_shareholding': data.dii_shareholding,
+                            'retail_shareholding': data.retail_shareholding
                         }
-                        json.dump(enhanced_data_dict, f, indent=2, cls=CustomJSONEncoder)
-                    
-                    print(f"✅ Enhanced fundamental data collected and saved: {enhanced_data_file}")
-                    
-                    # Update stock_data with enhanced fundamental data
-                    stock_data.fundamental_data = enhanced_fundamental_data
-                else:
-                    print(f"⚠️ Enhanced fundamental data collection returned None")
-                    
-            except Exception as e:
-                print(f"❌ Enhanced fundamental data collection error: {e}")
-                import traceback
-                traceback.print_exc()
+                        with open(enhanced_data_file, 'w') as f:
+                            json.dump(enhanced_data_dict, f, indent=2, cls=CustomJSONEncoder)
+                        return {'enhanced_fundamental_data': data}
+                except Exception as e:
+                    print(f"❌ Enhanced fundamental data collection error: {e}")
+                return {}
             
-            # 1. Capture Screener.in screenshot and extract data
-            print(f"📸 1.1: Capturing Screener.in screenshot for {ticker}...")
-            screener_screenshot = self.fundamental_agent._capture_complete_page_screenshot(ticker)
-            if screener_screenshot and os.path.exists(screener_screenshot):
-                # Copy to run directory
-                new_screener_path = os.path.join(screenshots_dir, f"screener_{ticker.replace('.NS', '')}.png")
-                import shutil
-                shutil.copy2(screener_screenshot, new_screener_path)
-                collected_data['screener_screenshot'] = new_screener_path
-                print(f"✅ Screener.in screenshot captured and saved: {new_screener_path}")
+            def task_screener():
+                result = {}
+                try:
+                    screenshot_path = self.fundamental_agent._capture_complete_page_screenshot(ticker)
+                    if screenshot_path and os.path.exists(screenshot_path):
+                        new_screener_path = os.path.join(screenshots_dir, f"screener_{ticker.replace('.NS', '')}.png")
+                        import shutil
+                        shutil.copy2(screenshot_path, new_screener_path)
+                        result['screener_screenshot'] = new_screener_path
+                        data = self.fundamental_agent._analyze_screenshot_with_openai(screenshot_path, ticker)
+                        if data:
+                            result['screener_data'] = data
+                            openai_response_path = os.path.join(openai_responses_dir, "screener_data_extraction.json")
+                            with open(openai_response_path, 'w') as f:
+                                json.dump(data, f, indent=2, cls=CustomJSONEncoder)
+                            print(f"✅ Screener.in data saved: {openai_response_path}")
+                    else:
+                        print("❌ Screenshot capture failed for screener")
+                        result['error'] = 'Screenshot capture failed'
+                except Exception as e:
+                    print(f"❌ Screener.in extraction failed: {e}")
+                    result['error'] = str(e)
                 
-                # Extract data from screenshot
-                print(f"🔍 1.2: Extracting Screener.in data...")
-                screener_data = self.fundamental_agent._analyze_screenshot_with_openai(screener_screenshot, ticker)
-                if screener_data:
-                    collected_data['screener_data'] = screener_data
-                    # Save OpenAI response
-                    openai_response_path = os.path.join(openai_responses_dir, "screener_data_extraction.json")
-                    with open(openai_response_path, 'w') as f:
-                        json.dump(screener_data, f, indent=2, cls=CustomJSONEncoder)
-                    print(f"✅ Screener.in data extracted and saved: {openai_response_path}")
-                else:
-                    print(f"⚠️ Screener.in data extraction failed")
-            else:
-                print(f"❌ Screener.in screenshot capture failed")
+                print(f"📊 Screener task completed")
+                return result
             
-            # 2. Capture all ArthaLens screenshots
-            print(f"📸 2.1: Capturing ArthaLens screenshots for {ticker}...")
-            arthalens_screenshots = self._capture_all_arthalens_screenshots(ticker)
-            if arthalens_screenshots:
-                # Copy all ArthaLens screenshots to run directory
-                arthalens_dir = os.path.join(screenshots_dir, "arthalens")
-                os.makedirs(arthalens_dir, exist_ok=True)
-                
-                for quarter, tabs in arthalens_screenshots.items():
-                    for tab, screenshot_path in tabs.items():
-                        if screenshot_path and os.path.exists(screenshot_path):
-                            new_path = os.path.join(arthalens_dir, f"{quarter.replace('+', '_')}_{tab}.png")
-                            shutil.copy2(screenshot_path, new_path)
-                            arthalens_screenshots[quarter][tab] = new_path
-                
-                collected_data['arthalens_screenshots'] = arthalens_screenshots
-                print(f"✅ ArthaLens screenshots captured and saved: {len(arthalens_screenshots)} quarters")
-                
-                # Extract ArthaLens data from screenshots
-                print(f"🔍 2.2: Extracting ArthaLens data...")
-                arthalens_data = self._extract_arthalens_data_optimized(ticker, arthalens_screenshots)
-                if arthalens_data:
-                    collected_data['arthalens_data'] = arthalens_data
-                    # Save OpenAI response
-                    openai_response_path = os.path.join(openai_responses_dir, "arthalens_data_extraction.json")
-                    with open(openai_response_path, 'w') as f:
-                        json.dump(arthalens_data, f, indent=2, cls=CustomJSONEncoder)
-                    print(f"✅ ArthaLens data extracted and saved: {openai_response_path}")
-                else:
-                    print(f"⚠️ ArthaLens data extraction failed")
-            else:
-                print(f"❌ ArthaLens screenshots capture failed")
+            def task_arthalens():
+                result = {}
+                try:
+                    screenshots = self._capture_all_arthalens_screenshots(ticker)
+                    if screenshots:
+                        arthalens_dir = os.path.join(screenshots_dir, "arthalens")
+                        os.makedirs(arthalens_dir, exist_ok=True)
+                        for quarter, tabs in screenshots.items():
+                            for tab, path in tabs.items():
+                                if path and os.path.exists(path):
+                                    new_path = os.path.join(arthalens_dir, f"{quarter.replace('+', '_')}_{tab}.png")
+                                    shutil.copy2(path, new_path)
+                                    screenshots[quarter][tab] = new_path
+                        result['arthalens_screenshots'] = screenshots
+                        data = self._extract_arthalens_data_optimized(ticker, screenshots)
+                        if data:
+                            result['arthalens_data'] = data
+                            openai_response_path = os.path.join(openai_responses_dir, "arthalens_data_extraction.json")
+                            with open(openai_response_path, 'w') as f:
+                                json.dump(data, f, indent=2, cls=CustomJSONEncoder)
+                    else:
+                        print("❌ ArthaLens screenshots capture failed")
+                except Exception as e:
+                    print(f"❌ ArthaLens task error: {e}")
+                return result
             
-            # 3. Generate candlestick chart
-            print(f"📊 3.1: Generating candlestick chart for {ticker}...")
-            if stock_data.ohlcv_data is not None and len(stock_data.ohlcv_data) > 0:
-                candlestick_chart = self.technical_agent._create_candlestick_chart(stock_data)
-                if candlestick_chart:
-                    # Save candlestick chart
-                    import base64
-                    chart_path = os.path.join(screenshots_dir, f"candlestick_{ticker.replace('.NS', '')}.png")
-                    with open(chart_path, 'wb') as f:
-                        f.write(base64.b64decode(candlestick_chart))
-                    collected_data['candlestick_chart'] = chart_path
-                    print(f"✅ Candlestick chart generated and saved: {chart_path}")
-                else:
-                    print(f"❌ Candlestick chart generation failed")
-            else:
-                print(f"❌ No OHLCV data available for candlestick chart")
+            def task_chart():
+                result = {}
+                try:
+                    if stock_data.ohlcv_data is not None and len(stock_data.ohlcv_data) > 0:
+                        chart_b64 = self.technical_agent._create_candlestick_chart(stock_data)
+                        if chart_b64:
+                            chart_path = os.path.join(screenshots_dir, f"candlestick_{ticker.replace('.NS', '')}.png")
+                            with open(chart_path, 'wb') as f:
+                                f.write(base64.b64decode(chart_b64))
+                            result['candlestick_chart'] = chart_path
+                    else:
+                        print("❌ No OHLCV data available for candlestick chart")
+                except Exception as e:
+                    print(f"❌ Chart task error: {e}")
+                return result
+            
+            # Run tasks in parallel (limit to avoid heavy Selenium contention)
+            tasks = [task_enhanced_fundamental, task_screener, task_arthalens, task_chart]
+            with ThreadPoolExecutor(max_workers=3) as executor:
+                futures = [executor.submit(t) for t in tasks]
+                for future in as_completed(futures):
+                    part = future.result() or {}
+                    collected_data.update(part)
+                    time.sleep(0.3)  # mild pacing
             
             # 4. Save OHLCV data
             if stock_data.ohlcv_data is not None:
@@ -4849,6 +4359,7 @@ The analysis provides a holistic view of {ticker} considering both quantitative 
                 'openai_responses_directory': None,
                 'screener_screenshot': None,
                 'screener_data': None,
+                'enhanced_fundamental_data': None,
                 'arthalens_screenshots': {},
                 'arthalens_data': {},
                 'candlestick_chart': None,

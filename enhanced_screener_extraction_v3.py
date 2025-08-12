@@ -619,9 +619,12 @@ Return ONLY the JSON object, nothing else.
                     image_data = base64.b64encode(image_file.read()).decode('utf-8')
                 
                 # Call OpenAI
-                response = self.client.chat.completions.create(
-                    model="gpt-4o-mini",
-                    messages=[
+                model_name = os.getenv('OPENAI_MODEL','gpt-5')
+                
+                # Prepare API parameters based on model
+                api_params = {
+                    "model": model_name,
+                    "messages": [
                         {
                             "role": "user",
                             "content": [
@@ -630,9 +633,14 @@ Return ONLY the JSON object, nothing else.
                             ]
                         }
                     ],
-                    max_tokens=1000,
-                    temperature=0.1
-                )
+                    "max_completion_tokens": 1000
+                }
+                
+                # Add temperature only for non-GPT-5 models
+                if not model_name.startswith('gpt-5'):
+                    api_params["temperature"] = 0.1
+                    
+                response = self.client.chat.completions.create(**api_params)
                 
                 # Parse response
                 response_text = response.choices[0].message.content.strip()
@@ -690,9 +698,9 @@ Return ONLY the JSON object, nothing else.
             elif section_name == 'quarterly':
                 # For quarterly, at least revenue should be present and be an array
                 if 'revenue' not in data or not isinstance(data['revenue'], list):
-                    return False
+                            return False
                 if len(data['revenue']) < 4:  # Should have at least 4 quarters
-                    return False
+                            return False
                 
                 # Validate EBITDA = Operating Profit
                 if 'operating_profit' in data and 'ebitda' in data:
