@@ -171,6 +171,19 @@ class EnhancedTechnicalAnalysisAgent:
         bb_lower = ma_20 - (2 * df['Close'].rolling(window=20).std())
         ax.fill_between(df.index, bb_upper, bb_lower, alpha=0.1, color='gray', label='Bollinger Bands')
         
+        # Support/Resistance/Target lines
+        try:
+            recent = df.tail(120)
+            support_level = float(recent['Low'].rolling(20).min().iloc[-1])
+            resistance_level = float(recent['High'].rolling(20).max().iloc[-1])
+            last_close = float(df['Close'].iloc[-1])
+            target_level = last_close * 1.1
+            ax.axhline(support_level, color='#2E8B57', linestyle='--', linewidth=1.2, label=f'Support ~ {support_level:.2f}')
+            ax.axhline(resistance_level, color='#DC143C', linestyle='--', linewidth=1.2, label=f'Resistance ~ {resistance_level:.2f}')
+            ax.axhline(target_level, color='#1E90FF', linestyle='--', linewidth=1.2, label=f'Target ~ {target_level:.2f}')
+        except Exception:
+            pass
+
         # Formatting
         ax.set_title(f'{ticker} - 3-Year Price Chart with Technical Indicators', fontsize=14, fontweight='bold')
         ax.set_ylabel('Price (₹)', fontsize=12)
@@ -225,7 +238,7 @@ class EnhancedTechnicalAnalysisAgent:
             
             # Get OpenAI analysis
             response = self.openai_client.chat.completions.create(
-                model="gpt-4o",
+                model=os.getenv('OPENAI_MODEL', 'gpt-5'),
                 messages=[
                     {
                         "role": "system",
@@ -236,8 +249,7 @@ class EnhancedTechnicalAnalysisAgent:
                         "content": prompt
                     }
                 ],
-                max_tokens=2000,
-                temperature=0.3
+                max_completion_tokens=2000
             )
             
             # Parse the response

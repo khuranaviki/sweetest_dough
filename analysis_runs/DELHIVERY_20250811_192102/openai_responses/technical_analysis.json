@@ -1,0 +1,23 @@
+{
+  "trend": "Bullish",
+  "support_levels": [
+    404.1
+  ],
+  "resistance_levels": [
+    470.8
+  ],
+  "entry_range": "\u20b9400-\u20b9410",
+  "short_term_target": "\u20b9514.75",
+  "medium_term_target": "\u20b9600",
+  "stop_loss": "\u20b9390",
+  "confidence_score": "Medium",
+  "indicators": {},
+  "patterns": [
+    "Inverse Head and Shoulders"
+  ],
+  "strategy_signals": [
+    "Buy on pullback",
+    "Volume confirmation"
+  ],
+  "position_sizing": "5% of portfolio"
+}

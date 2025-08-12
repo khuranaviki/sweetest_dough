@@ -1,0 +1,209 @@
+{
+  "ticker": "DELHIVERY.NS",
+  "company_name": "Delhivery",
+  "sector": "General",
+  "category": "Enhanced Analysis",
+  "analysis_timestamp": "2025-08-12T15:39:09.204864",
+  "technical_analysis": {
+    "trend": "Bullish",
+    "support_levels": [
+      404.1
+    ],
+    "resistance_levels": [
+      470.8,
+      509.3
+    ],
+    "entry_range": "\u20b9400-\u20b9420",
+    "short_term_target": "\u20b9470",
+    "medium_term_target": "\u20b9510",
+    "stop_loss": "\u20b9390",
+    "confidence_score": "Medium",
+    "indicators": {},
+    "patterns": [
+      "Ascending Triangle"
+    ],
+    "strategy_signals": [
+      "Buy on breakout",
+      "Hold for target"
+    ],
+    "position_sizing": "5% of portfolio"
+  },
+  "fundamental_analysis": {
+    "business_quality": "Medium",
+    "market_penetration": "Strong",
+    "pricing_power": "Medium",
+    "revenue_growth": "+12.5% (3Y Avg: +14.8%)",
+    "profit_growth": "+160.7% (3Y Avg: +108.0%)",
+    "debt_to_equity": "1.20",
+    "roce_roe": "ROCE: 2.47 %, ROE: 1.52 %",
+    "promoter_pledging": "52.95%",
+    "retail_shareholding": "0.00%",
+    "valuation_status": "Fair",
+    "fair_value": "\u20b9 462",
+    "financial_health": "Good",
+    "multibagger_potential": "High",
+    "fundamental_reasons": "Growth Analysis: Good growth quality (Score: 73/100).\n        \nGrowth Highlights:\n\u2022 Strong revenue growth of +12.5% YoY\n\u2022 Outstanding net profit growth of +160.7% YoY\n\u2022 Strong operational improvement with +838.5% EBITDA growth\n\u2022 Consistent operating profit growth averaging +269.6% QoQ\n\nFinancial Metrics: Market Cap \u20b9 34,492 Cr., ROCE 2.47 %, ROE 1.52 %, Revenue Growth +12.5% (3Y Avg: +14.8%), Profit Growth +160.7% (3Y Avg: +108.0%)\n\nGrowth Metrics Detail:\n\u2022 Revenue YoY: +12.5%\n\u2022 Net Profit YoY: +160.7%\n\u2022 Operating Profit YoY: +838.5%\n\u2022 Revenue 3Y Avg: +14.8%\n\u2022 Profit 3Y Avg: +108.0%",
+    "confidence_score": "Strong"
+  },
+  "strategy_analysis": {
+    "error": "Strategy analysis not applicable for category: Enhanced Analysis",
+    "category": "Enhanced Analysis",
+    "eligible": false,
+    "analysis_summary": "Strategy Performance Analysis: Not applicable for Enhanced Analysis category stocks. Only V40 and V40 Next categories are eligible for strategy analysis."
+  },
+  "final_recommendation": {
+    "action": "HOLD",
+    "entry_price": "\u20b9400-\u20b9420",
+    "target_price": "\u20b9510",
+    "stop_loss": "\u20b9390",
+    "time_horizon": "3-6 months",
+    "confidence_level": "Low (Basic Analysis)",
+    "risk_level": "Medium",
+    "position_size": "1-2% of portfolio",
+    "strategy_used": "Basic Analysis (Category: Enhanced Analysis)",
+    "key_risks": [
+      "Market volatility",
+      "Sector-specific risks",
+      "Strategy performance may not repeat"
+    ],
+    "fundamental_reasons": "Growth Analysis: Good growth quality (Score: 73/100).\n        \nGrowth Highlights:\n\u2022 Strong revenue growth of +12.5% YoY\n\u2022 Outstanding net profit growth of +160.7% YoY\n\u2022 Strong operational improvement with +838.5% EBITDA growth\n\u2022 Consistent operating profit growth averaging +269.6% QoQ\n\nFinancial Metrics: Market Cap \u20b9 34,492 Cr., ROCE 2.47 %, ROE 1.52 %, Revenue Growth +12.5% (3Y Avg: +14.8%), Profit Growth +160.7% (3Y Avg: +108.0%)\n\nGrowth Metrics Detail:\n\u2022 Revenue YoY: +12.5%\n\u2022 Net Profit YoY: +160.7%\n\u2022 Operating Profit YoY: +838.5%\n\u2022 Revenue 3Y Avg: +14.8%\n\u2022 Profit 3Y Avg: +108.0%"
+  },
+  "arthalens_data": {
+    "concall_summary": "I'm unable to extract or transcribe text from images, including screenshots. If you can provide the information in text format or summarize key points, I'd be glad to help you analyze it or organize it!",
+    "future_guidance": "I'm unable to extract text or data from the image you provided. However, if you can summarize the content or provide a text version of it, I would be happy to help organize or analyze it as needed!",
+    "transcript_summary": "I can't extract or display text from images or screenshots. However, you can provide the text or information you\u2019d like analyzed or summarized, and I can help you with that!"
+  },
+  "correlated_insights": {
+    "error": "'input'"
+  },
+  "run_directory": "analysis_runs/DELHIVERY_20250812_153037",
+  "enhanced_fundamental_data": {
+    "ticker": "DELHIVERY.NS",
+    "company_name": "Delhivery",
+    "sector": "General",
+    "market_cap": "34,649",
+    "pe_ratio": "147x",
+    "pb_ratio": null,
+    "roe": "10%",
+    "roa": null,
+    "roce": "2.47 %",
+    "debt_to_equity": null,
+    "current_ratio": null,
+    "quick_ratio": null,
+    "interest_coverage": null,
+    "revenue_growth_3y": null,
+    "profit_growth_3y": null,
+    "revenue_growth_1y": null,
+    "profit_growth_1y": null,
+    "revenue_growth_qoq": null,
+    "profit_growth_qoq": null,
+    "book_value": "127",
+    "face_value": null,
+    "dividend_yield": "0.00%",
+    "dividend_payout_ratio": null,
+    "price_to_book": null,
+    "price_to_sales": null,
+    "ev_to_ebitda": null,
+    "quarterly_column_headers": [
+      "Jun 2025",
+      "Mar 2025",
+      "Dec 2024",
+      "Jun 2024",
+      "Mar 2024",
+      "Dec 2023",
+      "Sep 2023",
+      "Jun 2023"
+    ],
+    "quarterly_revenue": [
+      "2,294",
+      "2,192",
+      "2,378",
+      "2,172",
+      "2,076",
+      "2,194",
+      "1,942",
+      "1,930"
+    ],
+    "quarterly_expenses": [
+      "2,153",
+      "2,072",
+      "2,278",
+      "2,076",
+      "2,030",
+      "2,089",
+      "1,957",
+      "1,943"
+    ],
+    "quarterly_operating_profit": [
+      "141",
+      "119",
+      "100",
+      "96",
+      "46",
+      "105",
+      "-16",
+      "-13"
+    ],
+    "quarterly_net_profit": [
+      "91",
+      "73",
+      "12",
+      "54",
+      "-68",
+      "100",
+      "51",
+      "108"
+    ],
+    "quarterly_ebitda": [
+      "141",
+      "119",
+      "100",
+      "96",
+      "46",
+      "105",
+      "-16",
+      "-13"
+    ],
+    "annual_column_headers": [
+      "Mar 2019",
+      "Mar 2020",
+      "Mar 2021",
+      "Mar 2022",
+      "Mar 2023",
+      "Mar 2024",
+      "Mar 2025"
+    ],
+    "annual_total_revenue": "8,142",
+    "annual_total_expenses": "8,015",
+    "annual_operating_profit": "127",
+    "annual_net_profit": "-249",
+    "annual_ebitda": "127",
+    "total_assets": "12,063",
+    "total_liabilities": "11,191",
+    "net_worth": "9,358",
+    "working_capital": "NA",
+    "operating_cf": "567",
+    "investing_cf": "-102",
+    "financing_cf": "-432",
+    "latest_quarter_revenue": null,
+    "latest_quarter_profit": null,
+    "latest_quarter_ebitda": null,
+    "latest_quarter_operating_margin": null,
+    "latest_quarter_net_margin": null,
+    "management_guidance": null,
+    "future_outlook": null,
+    "promoter_holding": "52.95%",
+    "promoter_pledging": null,
+    "retail_shareholding": "0.00%",
+    "institutional_shareholding": null,
+    "fii_shareholding": "29.60%",
+    "dii_shareholding": "17.46%",
+    "latest_filings": [
+      {
+        "headline": "Market analysis for Delhivery",
+        "sentiment": "Neutral",
+        "source": "Market Data"
+      }
+    ]
+  }
+}

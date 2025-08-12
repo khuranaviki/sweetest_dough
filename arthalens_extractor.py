@@ -512,7 +512,7 @@ Include ALL visible text and data from the complete page.
             
             # Call OpenAI with the appropriate prompt
             response = self.openai_client.chat.completions.create(
-                model="gpt-4o",
+                model=os.getenv('OPENAI_MODEL', 'gpt-5'),
                 messages=[
                     {
                         "role": "user",
@@ -527,8 +527,7 @@ Include ALL visible text and data from the complete page.
                         ]
                     }
                 ],
-                max_tokens=3000,
-                temperature=0
+                max_completion_tokens=3000
             )
             
             extracted_text = response.choices[0].message.content.strip()
@@ -597,15 +596,14 @@ Include ALL visible text and data from the complete page.
             """
             
             response = self.openai_client.chat.completions.create(
-                model="gpt-4o",
+                model=os.getenv('OPENAI_MODEL', 'gpt-5'),
                 messages=[
                     {
                         "role": "user",
                         "content": correlation_prompt
                     }
                 ],
-                max_tokens=3000,
-                temperature=0
+                max_completion_tokens=3000
             )
             
             correlated_insights = response.choices[0].message.content.strip()
@@ -682,15 +680,14 @@ Include ALL visible text and data from the complete page.
             """
             
             response = self.openai_client.chat.completions.create(
-                model="gpt-4o",
+                model=os.getenv('OPENAI_MODEL', 'gpt-5'),
                 messages=[
                     {
                         "role": "user",
                         "content": confidence_prompt
                     }
                 ],
-                max_tokens=2500,
-                temperature=0
+                max_completion_tokens=2500
             )
             
             confidence_analysis = response.choices[0].message.content.strip()

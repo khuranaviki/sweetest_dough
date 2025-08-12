@@ -1,0 +1,16 @@
+{
+  "ticker": "DELHIVERY.NS",
+  "timestamp": "20250811_191953",
+  "run_directory": "analysis_runs/DELHIVERY_20250811_191953",
+  "data_collected": {
+    "screener_in": false,
+    "arthalens": true,
+    "candlestick_chart": true,
+    "ohlcv_data": true
+  },
+  "files": {
+    "screenshots_dir": "analysis_runs/DELHIVERY_20250811_191953/screenshots",
+    "openai_responses_dir": "analysis_runs/DELHIVERY_20250811_191953/openai_responses",
+    "ohlcv_file": "analysis_runs/DELHIVERY_20250811_191953/ohlcv_data.csv"
+  }
+}

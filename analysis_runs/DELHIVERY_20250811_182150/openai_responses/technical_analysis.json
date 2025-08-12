@@ -1,0 +1,27 @@
+{
+  "trend": "Bullish",
+  "support_levels": [
+    430.0,
+    404.0
+  ],
+  "resistance_levels": [
+    471.0,
+    515.0
+  ],
+  "entry_range": "\u20b9445-\u20b9455",
+  "short_term_target": "\u20b9470",
+  "medium_term_target": "\u20b9515",
+  "stop_loss": "\u20b9404",
+  "confidence_score": "Medium",
+  "indicators": {},
+  "patterns": [
+    "Rounding bottom/base with neckline near \u20b9470",
+    "Golden cross (50 MA > 200 MA)",
+    "Higher-high higher-low structure"
+  ],
+  "strategy_signals": [
+    "Buy the dip near 20-DMA (\u20b9445-\u20b9455) with SL \u20b9404; book partial at \u20b9470",
+    "Add on breakout above \u20b9472 with strong volume; trail stop under \u20b9450 then \u20b9428"
+  ],
+  "position_sizing": "5% of portfolio"
+}

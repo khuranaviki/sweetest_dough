@@ -534,7 +534,7 @@ class EnhancedTechnicalAnalysisAgent:
             cost_tracker.log_api_call(
                 model=os.getenv('OPENAI_MODEL', 'gpt-5'),
                 tokens_used=response.usage.total_tokens,
-                cost_usd=response.usage.total_tokens * 0.003 / 1000,  # gpt-4o pricing
+                cost_usd=response.usage.total_tokens * 0.003 / 1000,  # gpt-5 pricing
                 description=f"Technical analysis for {stock_data.ticker}"
             )
             
@@ -872,7 +872,7 @@ Please respond in this exact JSON format:
             print(f"⚠️ OpenAI technical analysis failed: {e}")
             return None
 
-    def _create_candlestick_chart(self, stock_data: StockData) -> Optional[str]:
+    def _create_candlestick_chart(self, stock_data: StockData, technical_analysis: Optional[EnhancedTechnicalAnalysis] = None) -> Optional[str]:
         """Create a professional candlestick chart from OHLCV data"""
         try:
             if stock_data.ohlcv_data is None or len(stock_data.ohlcv_data) == 0:
@@ -899,7 +899,7 @@ Please respond in this exact JSON format:
             ax2.set_facecolor('white')
             
             # Plot candlestick chart
-            self._plot_candlesticks(ax1, df, stock_data.ticker)
+            self._plot_candlesticks(ax1, df, stock_data.ticker, technical_analysis)
             
             # Plot volume
             self._plot_volume(ax2, df)
@@ -918,14 +918,21 @@ Please respond in this exact JSON format:
             chart_base64 = base64.b64encode(buffer.getvalue()).decode('utf-8')
             plt.close()
             
-            print(f"📊 Created candlestick chart for {stock_data.ticker}")
-            return chart_base64
+            # Save chart locally
+            ticker_clean = stock_data.ticker.replace('.NS', '')
+            chart_filename = f"candlestick_{ticker_clean}.png"
+            
+            # Save to current directory (will be moved by caller if needed)
+            with open(chart_filename, 'wb') as f:
+                f.write(buffer.getvalue())
+            
+            return chart_filename
             
         except Exception as e:
             print(f"❌ Error creating candlestick chart: {e}")
             return None
     
-    def _plot_candlesticks(self, ax, df: pd.DataFrame, ticker: str):
+    def _plot_candlesticks(self, ax, df: pd.DataFrame, ticker: str, technical_analysis: Optional[EnhancedTechnicalAnalysis] = None):
         """Plot candlestick chart with technical indicators"""
         # Calculate moving averages
         ma_20 = df['Close'].rolling(window=20).mean()
@@ -970,15 +977,46 @@ Please respond in this exact JSON format:
         
         # Support, Resistance, and Target lines
         try:
+            # Default calculations
             recent = df.tail(120)
-            support_level = float(recent['Low'].rolling(20).min().iloc[-1])
-            resistance_level = float(recent['High'].rolling(20).max().iloc[-1])
+            default_support = float(recent['Low'].rolling(20).min().iloc[-1])
+            default_resistance = float(recent['High'].rolling(20).max().iloc[-1])
             last_close = float(df['Close'].iloc[-1])
-            target_level = last_close * 1.1
+            default_target = last_close * 1.1
+            
+            # Use technical analysis values if available
+            if technical_analysis:
+                support_levels = getattr(technical_analysis, 'support_levels', [default_support])
+                resistance_levels = getattr(technical_analysis, 'resistance_levels', [default_resistance])
+                
+                # Extract target from short_term_target or medium_term_target
+                short_target_str = getattr(technical_analysis, 'short_term_target', '')
+                medium_target_str = getattr(technical_analysis, 'medium_term_target', '')
+                
+                target_level = default_target
+                try:
+                    # Try to extract numeric value from target strings (remove ₹ symbol)
+                    if short_target_str and short_target_str != "Not Available":
+                        target_level = float(short_target_str.replace('₹', '').replace(',', '').strip())
+                    elif medium_target_str and medium_target_str != "Not Available":
+                        target_level = float(medium_target_str.replace('₹', '').replace(',', '').strip())
+                except (ValueError, AttributeError):
+                    target_level = default_target
+                
+                # Use first support and resistance levels
+                support_level = support_levels[0] if support_levels else default_support
+                resistance_level = resistance_levels[0] if resistance_levels else default_resistance
+            else:
+                support_level = default_support
+                resistance_level = default_resistance
+                target_level = default_target
+            
+            # Plot the lines
             ax.axhline(support_level, color='#2E8B57', linestyle='--', linewidth=1.2, label=f'Support ~ {support_level:.2f}')
             ax.axhline(resistance_level, color='#DC143C', linestyle='--', linewidth=1.2, label=f'Resistance ~ {resistance_level:.2f}')
             ax.axhline(target_level, color='#1E90FF', linestyle='--', linewidth=1.2, label=f'Target ~ {target_level:.2f}')
-        except Exception:
+        except Exception as e:
+            print(f"⚠️ Error plotting S/R/T lines: {e}")
             pass
         
         ax.set_title(f'{ticker} - 3-Year Candlestick Chart (with S/R + Target)', fontsize=14, fontweight='bold')
@@ -2493,6 +2531,9 @@ class EnhancedMultiAgentStockAnalysis:
             print(f"\n📊 Step 3: Performing Technical Analysis...")
             technical_analysis = self._perform_technical_analysis_with_collected_data(stock_data, collected_data)
             print(f"✅ Technical analysis completed")
+            
+            # Update chart with technical analysis results
+            self._update_chart_with_technical_analysis(stock_data, technical_analysis, collected_data)
             
             # Step 4: Strategy Performance Analysis (for eligible stocks)
             print(f"\n🎯 Step 4: Analyzing Strategy Performance...")
@@ -4289,12 +4330,17 @@ The analysis provides a holistic view of {ticker} considering both quantitative 
                 result = {}
                 try:
                     if stock_data.ohlcv_data is not None and len(stock_data.ohlcv_data) > 0:
-                        chart_b64 = self.technical_agent._create_candlestick_chart(stock_data)
-                        if chart_b64:
+                        chart_filename = self.technical_agent._create_candlestick_chart(stock_data)
+                        if chart_filename:
                             chart_path = os.path.join(screenshots_dir, f"candlestick_{ticker.replace('.NS', '')}.png")
-                            with open(chart_path, 'wb') as f:
-                                f.write(base64.b64decode(chart_b64))
-                            result['candlestick_chart'] = chart_path
+                            # Move the chart from current directory to screenshots directory
+                            if os.path.exists(chart_filename):
+                                import shutil
+                                shutil.move(chart_filename, chart_path)
+                                result['candlestick_chart'] = chart_path
+                                print(f"✅ Initial candlestick chart saved: {chart_path}")
+                            else:
+                                print(f"⚠️ Chart file {chart_filename} not found")
                     else:
                         print("❌ No OHLCV data available for candlestick chart")
                 except Exception as e:
@@ -4454,7 +4500,7 @@ The analysis provides a holistic view of {ticker} considering both quantitative 
                     arthalens_data = collected_data.get('arthalens_data', {})
                     
                     # Generate correlated insights
-                    correlated_insights = self.fundamental_agent._generate_correlated_insights(
+                    correlated_insights = self.fundamental_agent._generate_comprehensive_correlated_insights(
                         stock_data.ticker, analysis, arthalens_data
                     )
                     
@@ -4581,7 +4627,7 @@ The analysis provides a holistic view of {ticker} considering both quantitative 
             arthalens_data = collected_data.get('arthalens_data', {})
             
             # Generate correlated insights
-            correlated_insights = self.fundamental_agent._generate_correlated_insights(
+            correlated_insights = self.fundamental_agent._generate_comprehensive_correlated_insights(
                 ticker, {'context': analysis_context}, arthalens_data
             )
             
@@ -4801,6 +4847,38 @@ The analysis provides a holistic view of {ticker} considering both quantitative 
         except Exception as e:
             print(f"❌ Error reading chart from path {chart_path}: {e}")
             return None
+
+    def _update_chart_with_technical_analysis(self, stock_data: StockData, technical_analysis: EnhancedTechnicalAnalysis, collected_data: Dict) -> None:
+        """Update the candlestick chart with technical analysis results"""
+        try:
+            print(f"📊 Updating candlestick chart with technical analysis results...")
+            
+            # Create updated chart with technical analysis
+            chart_filename = self.technical_agent._create_candlestick_chart(stock_data, technical_analysis)
+            if chart_filename:
+                # Move the chart to the correct location
+                ticker_clean = stock_data.ticker.replace('.NS', '')
+                run_dir = collected_data.get('run_directory', '.')
+                screenshots_dir = os.path.join(run_dir, 'screenshots')
+                os.makedirs(screenshots_dir, exist_ok=True)
+                
+                final_chart_path = os.path.join(screenshots_dir, f"candlestick_{ticker_clean}.png")
+                
+                # Move the chart if it was created in current directory
+                if os.path.exists(chart_filename):
+                    import shutil
+                    shutil.move(chart_filename, final_chart_path)
+                    print(f"✅ Updated candlestick chart saved to: {final_chart_path}")
+                    
+                    # Update collected_data
+                    collected_data['candlestick_chart'] = final_chart_path
+                else:
+                    print(f"⚠️ Chart file {chart_filename} not found")
+            else:
+                print("❌ Failed to create updated chart with technical analysis")
+                
+        except Exception as e:
+            print(f"❌ Error updating chart with technical analysis: {e}")
 
 # Custom JSON encoder to handle pandas Timestamp objects
 class CustomJSONEncoder(json.JSONEncoder):

@@ -177,7 +177,7 @@ class EnhancedStockAnalysisChatApp:
         """Estimate the cost of running analysis for a company"""
         # Base cost estimates based on our testing
         base_costs = {
-            'technical_analysis': 0.005,  # $0.005 for gpt-4o vision
+            'technical_analysis': 0.005,  # $0.005 for gpt-5 vision
             'fundamental_analysis': 0.005,  # $0.005 for screener + arthalens
             'strategy_backtesting': 0.002,  # $0.002 for backtesting
             'report_generation': 0.001,     # $0.001 for report generation
@@ -862,18 +862,39 @@ class EnhancedStockAnalysisChatApp:
             if 'analysis_data' in st.session_state and st.session_state.analysis_data:
                 # Look for chart in the current analysis data
                 analysis_data = st.session_state.analysis_data
+                
+                # Extract ticker from the analysis data
+                ticker = "DELHIVERY"  # default fallback
+                if 'ticker' in analysis_data:
+                    ticker = analysis_data['ticker'].replace('.NS', '')
+                elif 'stock_data' in analysis_data and 'ticker' in analysis_data['stock_data']:
+                    ticker = analysis_data['stock_data']['ticker'].replace('.NS', '')
+                elif 'run_directory' in analysis_data:
+                    # Extract ticker from run directory name (e.g., "TCS_20250812_161442")
+                    run_dir_name = os.path.basename(analysis_data['run_directory'])
+                    if '_' in run_dir_name:
+                        ticker = run_dir_name.split('_')[0]
+                
                 if 'run_directory' in analysis_data:
-                    chart_path = os.path.join(analysis_data['run_directory'], 'screenshots', 'candlestick_DELHIVERY.png')
+                    chart_path = os.path.join(analysis_data['run_directory'], 'screenshots', f'candlestick_{ticker}.png')
                 
                 # If not found, look in the most recent analysis run
                 if not chart_path or not os.path.exists(chart_path):
                     analysis_runs_dir = 'analysis_runs'
                     if os.path.exists(analysis_runs_dir):
-                        # Get the most recent run directory
-                        run_dirs = [d for d in os.listdir(analysis_runs_dir) if d.startswith('DELHIVERY_')]
-                        if run_dirs:
+                        # Get the most recent run directory for this ticker
+                        run_dirs = [d for d in os.listdir(analysis_runs_dir) if d.startswith(f'{ticker}_')]
+                        if not run_dirs:
+                            # If no runs found for this ticker, get any recent run
+                            all_runs = [d for d in os.listdir(analysis_runs_dir) if '_' in d]
+                            if all_runs:
+                                latest_run = sorted(all_runs)[-1]
+                                # Extract ticker from the latest run
+                                latest_ticker = latest_run.split('_')[0]
+                                chart_path = os.path.join(analysis_runs_dir, latest_run, 'screenshots', f'candlestick_{latest_ticker}.png')
+                        else:
                             latest_run = sorted(run_dirs)[-1]
-                            chart_path = os.path.join(analysis_runs_dir, latest_run, 'screenshots', f'candlestick_DELHIVERY.png')
+                            chart_path = os.path.join(analysis_runs_dir, latest_run, 'screenshots', f'candlestick_{ticker}.png')
             
             # Display the chart if found
             if chart_path and os.path.exists(chart_path):

@@ -1,0 +1,89 @@
+{
+  "ticker": "DELHIVERY",
+  "company_name": "DELHIVERY LTD",
+  "sector": "Logistics",
+  "market_cap": null,
+  "pe_ratio": "147x",
+  "book_value": null,
+  "roce": null,
+  "roe": "10%",
+  "quarterly_column_headers": [
+    "NA",
+    "NA",
+    "NA",
+    "NA",
+    "NA",
+    "NA",
+    "NA",
+    "NA"
+  ],
+  "quarterly_revenue": [
+    "NA",
+    "NA",
+    "NA",
+    "NA",
+    "NA",
+    "NA",
+    "NA",
+    "NA"
+  ],
+  "quarterly_expenses": [
+    "NA",
+    "NA",
+    "NA",
+    "NA",
+    "NA",
+    "NA",
+    "NA",
+    "NA"
+  ],
+  "quarterly_operating_profit": [
+    "NA",
+    "NA",
+    "NA",
+    "NA",
+    "NA",
+    "NA",
+    "NA",
+    "NA"
+  ],
+  "quarterly_net_profit": [
+    "NA",
+    "NA",
+    "NA",
+    "NA",
+    "NA",
+    "NA",
+    "NA",
+    "NA"
+  ],
+  "quarterly_ebitda": [
+    "NA",
+    "NA",
+    "NA",
+    "NA",
+    "NA",
+    "NA",
+    "NA",
+    "NA"
+  ],
+  "annual_column_headers": [
+    "NA"
+  ],
+  "annual_total_revenue": "NA",
+  "annual_total_expenses": "NA",
+  "annual_operating_profit": "NA",
+  "annual_net_profit": "NA",
+  "annual_ebitda": "NA",
+  "total_assets": "NA",
+  "total_liabilities": "NA",
+  "net_worth": "NA",
+  "working_capital": "NA",
+  "operating_cf": "NA",
+  "investing_cf": "NA",
+  "financing_cf": "NA",
+  "promoter_holding": "NA",
+  "fii_shareholding": "NA",
+  "dii_shareholding": "NA",
+  "retail_shareholding": "NA"
+}

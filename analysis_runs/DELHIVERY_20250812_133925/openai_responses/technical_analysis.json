@@ -1,0 +1,30 @@
+{
+  "trend": "Bullish",
+  "support_levels": [
+    404.1,
+    442.0
+  ],
+  "resistance_levels": [
+    470.8,
+    511.7
+  ],
+  "entry_range": "\u20b9448-\u20b9458",
+  "short_term_target": "\u20b9495",
+  "medium_term_target": "\u20b9530",
+  "stop_loss": "\u20b9430",
+  "confidence_score": "Medium",
+  "indicators": {},
+  "patterns": [
+    "Higher highs and higher lows",
+    "Golden cross (50DMA above 200DMA)",
+    "Bollinger Band expansion after squeeze",
+    "Rounded-bottom/base breakout setup"
+  ],
+  "strategy_signals": [
+    "Buy the dip near \u20b9450 (around 20DMA) or buy a breakout-sustain above \u20b9472 with strong volume",
+    "Trail stop below 20DMA; move stop to cost after a close above \u20b9485",
+    "Book partial profits near \u20b9500-\u20b9512; hold remainder for \u20b9530",
+    "Avoid fresh longs if price closes back below \u20b9440 (loss of momentum zone)"
+  ],
+  "position_sizing": "3-5% of portfolio"
+}

@@ -1,0 +1,24 @@
+{
+  "trend": "Bullish",
+  "support_levels": [
+    404.1
+  ],
+  "resistance_levels": [
+    470.8,
+    509.3
+  ],
+  "entry_range": "\u20b9400-\u20b9420",
+  "short_term_target": "\u20b9470",
+  "medium_term_target": "\u20b9510",
+  "stop_loss": "\u20b9390",
+  "confidence_score": "Medium",
+  "indicators": {},
+  "patterns": [
+    "Ascending Triangle"
+  ],
+  "strategy_signals": [
+    "Buy on breakout",
+    "Hold for target"
+  ],
+  "position_sizing": "5% of portfolio"
+}

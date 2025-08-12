@@ -1,0 +1,29 @@
+{
+  "trend": "Bearish",
+  "support_levels": [
+    2992.0,
+    2900.0
+  ],
+  "resistance_levels": [
+    3245.0,
+    3339.0
+  ],
+  "entry_range": "\u20b93180-\u20b93250",
+  "short_term_target": "\u20b93020",
+  "medium_term_target": "\u20b92880",
+  "stop_loss": "\u20b93335",
+  "confidence_score": "Medium",
+  "indicators": {},
+  "patterns": [
+    "Head-and-Shoulders top (neckline broken)",
+    "Death cross (50D below 200D)",
+    "Descending channel with lower highs/lows",
+    "Bollinger Bands walk on lower band"
+  ],
+  "strategy_signals": [
+    "Sell the rally: look to short near \u20b93180-\u20b93250 (prior support/20\u201350DMA zone) on bearish rejection",
+    "Avoid fresh longs until a daily close above \u20b93245\u2013\u20b93339 with volume (would signal trend reversal)",
+    "If \u20b92990 breaks on volume, trail/add to shorts for a move toward \u20b92880"
+  ],
+  "position_sizing": "3-5% of portfolio; risk \u22641% of portfolio per trade"
+}

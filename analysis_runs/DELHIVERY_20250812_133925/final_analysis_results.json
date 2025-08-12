@@ -1,0 +1,151 @@
+{
+  "ticker": "DELHIVERY.NS",
+  "company_name": "Delhivery",
+  "sector": "General",
+  "category": "Enhanced Analysis",
+  "analysis_timestamp": "2025-08-12T13:54:39.572552",
+  "technical_analysis": {
+    "trend": "Bullish",
+    "support_levels": [
+      404.1,
+      442.0
+    ],
+    "resistance_levels": [
+      470.8,
+      511.7
+    ],
+    "entry_range": "\u20b9448-\u20b9458",
+    "short_term_target": "\u20b9495",
+    "medium_term_target": "\u20b9530",
+    "stop_loss": "\u20b9430",
+    "confidence_score": "Medium",
+    "indicators": {},
+    "patterns": [
+      "Higher highs and higher lows",
+      "Golden cross (50DMA above 200DMA)",
+      "Bollinger Band expansion after squeeze",
+      "Rounded-bottom/base breakout setup"
+    ],
+    "strategy_signals": [
+      "Buy the dip near \u20b9450 (around 20DMA) or buy a breakout-sustain above \u20b9472 with strong volume",
+      "Trail stop below 20DMA; move stop to cost after a close above \u20b9485",
+      "Book partial profits near \u20b9500-\u20b9512; hold remainder for \u20b9530",
+      "Avoid fresh longs if price closes back below \u20b9440 (loss of momentum zone)"
+    ],
+    "position_sizing": "3-5% of portfolio"
+  },
+  "fundamental_analysis": {
+    "business_quality": "Low",
+    "market_penetration": "Strong",
+    "pricing_power": "Medium",
+    "revenue_growth": "NA",
+    "profit_growth": "NA",
+    "debt_to_equity": "1.29",
+    "roce_roe": "ROCE: 2.47 %, ROE: 1.52 %",
+    "promoter_pledging": "NA",
+    "retail_shareholding": "17.46%",
+    "valuation_status": "Fair",
+    "fair_value": "\u20b9 465",
+    "financial_health": "Average",
+    "multibagger_potential": "Moderate",
+    "fundamental_reasons": "Based on extracted data: Market Cap \u20b9 34,716 Cr., ROCE 2.47 %, ROE 1.52 %, Revenue Growth NA, Profit Growth NA",
+    "confidence_score": "Low"
+  },
+  "strategy_analysis": {
+    "error": "Strategy analysis not applicable for category: Enhanced Analysis",
+    "category": "Enhanced Analysis",
+    "eligible": false,
+    "analysis_summary": "Strategy Performance Analysis: Not applicable for Enhanced Analysis category stocks. Only V40 and V40 Next categories are eligible for strategy analysis."
+  },
+  "final_recommendation": {
+    "action": "HOLD",
+    "entry_price": "\u20b9448-\u20b9458",
+    "target_price": "\u20b9530",
+    "stop_loss": "\u20b9430",
+    "time_horizon": "3-6 months",
+    "confidence_level": "Low (Basic Analysis)",
+    "risk_level": "Medium",
+    "position_size": "1-2% of portfolio",
+    "strategy_used": "Basic Analysis (Category: Enhanced Analysis)",
+    "key_risks": [
+      "Market volatility",
+      "Sector-specific risks",
+      "Strategy performance may not repeat"
+    ],
+    "fundamental_reasons": "Based on extracted data: Market Cap \u20b9 34,716 Cr., ROCE 2.47 %, ROE 1.52 %, Revenue Growth NA, Profit Growth NA"
+  },
+  "arthalens_data": {
+    "transcript_summary": "Below is a faithful extraction of all text and data visible in the provided full\u2011page screenshot of the ArthaLens \u201cEarnings Calls\u201d (Transcript) view for DELHIVERY LTD, Quarter: Q4 FY25. Where a requested subsection has no on\u2011screen data, it is explicitly noted as \u201cNot visible in screenshot.\u201d\n\n1) Financial Data\n- Market capitalization\n  - Market Cap: \u20b934,966.64 Cr\n- Stock price (as displayed on the page header)\n  - Price: \u20b9465.2\n  - Daily change: -0.59%\n  - Timestamp: Aug 12, 1:30 PM IST\n- Revenue, profit, margins\n  - Not visible in screenshot.\n- Growth rates and trends\n  - Not visible in screenshot.\n- Key performance indicators\n  - Not visible in screenshot.\n- Segment-wise performance\n  - Not visible in screenshot.\n\n2) Operational Data\n- Business/industry classification shown on header line\n  - DELHIVERY \u2022 Transportation \u2022 Air Freight/Couriers\n- Business metrics\n  - Not visible in screenshot.\n- Operational efficiency\n  - Not visible in screenshot.\n- Market performance\n  - Not visible beyond the stock price and change above.\n- Customer data\n  - Not visible in screenshot.\n\n3) Strategic Information\n- Management commentary\n  - Not visible in screenshot.\n- Strategic initiatives\n  - Not visible in screenshot.\n- Market outlook\n  - Not visible in screenshot.\n- Future plans\n  - Not visible in screenshot.\n\n4) Risk and Challenges\n- Risk factors\n  - The tab \u201cRisk Factors\u201d is visible in the top navigation, but no risk content is shown on this page view.\n- Operational challenges\n  - Not visible in screenshot.\n- Market risks\n  - Not visible in screenshot.\n- Competitive threats\n  - Not visible in screenshot.\n\n5) Page context and navigation elements (all visible text)\n- Site/Product branding and top bar\n  - ArthaLens Beta v0.4\n  - Company Info\n  - Keyword Search New\n  - Search companies\u2026 (search bar placeholder)\n  - Changelog\n  - Sign In\n- Company header\n  - DELHIVERY LTD\n  - DELHIVERY \u2022 Transportation \u2022 Air Freight/Couriers\n  - \u20b9465.2 -0.59% Aug 12, 1:30 PM IST\n  - Market Cap \u20b934,966.64 Cr\n- Section tabs (top of company page)\n  - Business Structure\n  - Earnings Calls (active)\n  - Risk Factors\n  - Regulation Dependencies\n- Earnings calls header and controls\n  - Earnings Call Analysis\n  - Comprehensive analysis of quarterly earnings calls\n  - [<] [Q4 FY25 \u25bc] [>]\n  - Transcript PDF\n  - Remaining Today: 50\n  - Custom AI Prompt\n  - Reactions (thumbs up / thumbs down icons visible)\n- Sub-tabs within the Earnings Call Analysis section\n  - Summary\n  - Guidance\n  - Q&A\n- Content area\n  - Appears blank/empty in the screenshot; no transcript text, KPIs, tables, or charts are visible.\n\nNotes\n- The screenshot shows the framework of the \u201cEarnings Call Analysis\u201d page for Q4 FY25 with navigation and action buttons, but no actual transcript content, metrics, guidance text, or Q&A entries are displayed.\n- No additional numerical data for revenue, profitability, margins, segment performance, or guidance is visible on this page capture."
+  },
+  "correlated_insights": {
+    "error": "'input'"
+  },
+  "run_directory": "analysis_runs/DELHIVERY_20250812_133925",
+  "enhanced_fundamental_data": {
+    "ticker": "DELHIVERY.NS",
+    "company_name": "Delhivery",
+    "sector": "General",
+    "market_cap": "\u20b9 34,780 Cr.",
+    "pe_ratio": "147x",
+    "pb_ratio": null,
+    "roe": "10%",
+    "roa": null,
+    "roce": "2.47 %",
+    "debt_to_equity": null,
+    "current_ratio": null,
+    "quick_ratio": null,
+    "interest_coverage": null,
+    "revenue_growth_3y": null,
+    "profit_growth_3y": null,
+    "revenue_growth_1y": null,
+    "profit_growth_1y": null,
+    "revenue_growth_qoq": null,
+    "profit_growth_qoq": null,
+    "book_value": "\u20b9 127",
+    "face_value": null,
+    "dividend_yield": "0.00%",
+    "dividend_payout_ratio": null,
+    "price_to_book": null,
+    "price_to_sales": null,
+    "ev_to_ebitda": null,
+    "quarterly_column_headers": null,
+    "quarterly_revenue": null,
+    "quarterly_expenses": null,
+    "quarterly_operating_profit": null,
+    "quarterly_net_profit": null,
+    "quarterly_ebitda": null,
+    "annual_column_headers": null,
+    "annual_total_revenue": null,
+    "annual_total_expenses": null,
+    "annual_operating_profit": null,
+    "annual_net_profit": null,
+    "annual_ebitda": null,
+    "total_assets": "12,063",
+    "total_liabilities": "12,063",
+    "net_worth": "9,358",
+    "working_capital": "NA",
+    "operating_cf": "567",
+    "investing_cf": "-102",
+    "financing_cf": "-432",
+    "latest_quarter_revenue": null,
+    "latest_quarter_profit": null,
+    "latest_quarter_ebitda": null,
+    "latest_quarter_operating_margin": null,
+    "latest_quarter_net_margin": null,
+    "management_guidance": null,
+    "future_outlook": null,
+    "promoter_holding": "NA",
+    "promoter_pledging": null,
+    "retail_shareholding": "17.46%",
+    "institutional_shareholding": null,
+    "fii_shareholding": "52.95%",
+    "dii_shareholding": "29.60%",
+    "latest_filings": [
+      {
+        "headline": "Market analysis for Delhivery",
+        "sentiment": "Neutral",
+        "source": "Market Data"
+      }
+    ]
+  }
+}
