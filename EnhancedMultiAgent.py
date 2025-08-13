@@ -1864,12 +1864,12 @@ class EnhancedFundamentalAnalysisAgent:
                     business_quality = "Medium"
                 elif growth_score >= 60:  # Strong growth can offset moderate ratios
                     business_quality = "Medium"
-                else:
+                        else:
                     business_quality = "Low"
             except:
                 if growth_assessment['overall_score'] >= 70:
                     business_quality = "Medium"  # Growth-driven assessment
-                else:
+                            else:
                     business_quality = "Can't Say"
         elif growth_assessment['overall_score'] >= 70:
             business_quality = "Medium"  # Pure growth-based assessment
@@ -1885,17 +1885,17 @@ class EnhancedFundamentalAnalysisAgent:
                 if mc_val > 50000:  # Large cap
                     if growth_score >= 70:
                         valuation_status = "Fair"  # Growth justifies large cap
-                    else:
+                                else:
                         valuation_status = "Expensive"
                 elif mc_val > 10000:  # Mid cap
                     if growth_score >= 60:
                         valuation_status = "Attractive"
-                    else:
+                                    else:
                         valuation_status = "Fair"
                 else:  # Small cap
                     if growth_score >= 50:
                         valuation_status = "Attractive"
-                    else:
+                        else:
                         valuation_status = "Cheap"
             except:
                 valuation_status = "Fair"
@@ -2168,7 +2168,7 @@ Growth Metrics Detail:
                 elif yoy_rev < -10:
                     growth_assessment['revenue_score'] = 20
                     growth_assessment['growth_summary'].append(f"Declining revenue with {self._format_growth_percentage(yoy_rev)} YoY contraction")
-                else:
+        else:
                     growth_assessment['revenue_score'] = 35
                     growth_assessment['growth_summary'].append(f"Revenue decline of {self._format_growth_percentage(yoy_rev)} YoY")
                 
@@ -2233,7 +2233,7 @@ Growth Metrics Detail:
                         consistency_scores.append(60)
                     elif avg_qoq < -10:
                         consistency_scores.append(25)
-                    else:
+            else:
                         consistency_scores.append(45)
             
             if consistency_scores:
@@ -2252,7 +2252,7 @@ Growth Metrics Detail:
                     growth_assessment['growth_quality'] = 'Good'
                 elif growth_assessment['overall_score'] >= 45:
                     growth_assessment['growth_quality'] = 'Average'
-                else:
+            else:
                     growth_assessment['growth_quality'] = 'Poor'
             
         except Exception as e:
@@ -4290,18 +4290,18 @@ The analysis provides a holistic view of {ticker} considering both quantitative 
                 try:
                     screenshot_path = self.fundamental_agent._capture_complete_page_screenshot(ticker)
                     if screenshot_path and os.path.exists(screenshot_path):
-                        new_screener_path = os.path.join(screenshots_dir, f"screener_{ticker.replace('.NS', '')}.png")
-                        import shutil
+                new_screener_path = os.path.join(screenshots_dir, f"screener_{ticker.replace('.NS', '')}.png")
+                import shutil
                         shutil.copy2(screenshot_path, new_screener_path)
                         result['screener_screenshot'] = new_screener_path
                         data = self.fundamental_agent._analyze_screenshot_with_openai(screenshot_path, ticker)
                         if data:
                             result['screener_data'] = data
-                            openai_response_path = os.path.join(openai_responses_dir, "screener_data_extraction.json")
-                            with open(openai_response_path, 'w') as f:
+                    openai_response_path = os.path.join(openai_responses_dir, "screener_data_extraction.json")
+                    with open(openai_response_path, 'w') as f:
                                 json.dump(data, f, indent=2, cls=CustomJSONEncoder)
                             print(f"✅ Screener.in data saved: {openai_response_path}")
-                    else:
+                else:
                         print("❌ Screenshot capture failed for screener")
                         result['error'] = 'Screenshot capture failed'
                 except Exception as e:
@@ -4316,22 +4316,22 @@ The analysis provides a holistic view of {ticker} considering both quantitative 
                 try:
                     screenshots = self._capture_all_arthalens_screenshots(ticker)
                     if screenshots:
-                        arthalens_dir = os.path.join(screenshots_dir, "arthalens")
-                        os.makedirs(arthalens_dir, exist_ok=True)
+                arthalens_dir = os.path.join(screenshots_dir, "arthalens")
+                os.makedirs(arthalens_dir, exist_ok=True)
                         for quarter, tabs in screenshots.items():
                             for tab, path in tabs.items():
                                 if path and os.path.exists(path):
-                                    new_path = os.path.join(arthalens_dir, f"{quarter.replace('+', '_')}_{tab}.png")
+                            new_path = os.path.join(arthalens_dir, f"{quarter.replace('+', '_')}_{tab}.png")
                                     shutil.copy2(path, new_path)
                                     screenshots[quarter][tab] = new_path
                         result['arthalens_screenshots'] = screenshots
                         data = self._extract_arthalens_data_optimized(ticker, screenshots)
                         if data:
                             result['arthalens_data'] = data
-                            openai_response_path = os.path.join(openai_responses_dir, "arthalens_data_extraction.json")
-                            with open(openai_response_path, 'w') as f:
+                    openai_response_path = os.path.join(openai_responses_dir, "arthalens_data_extraction.json")
+                    with open(openai_response_path, 'w') as f:
                                 json.dump(data, f, indent=2, cls=CustomJSONEncoder)
-                    else:
+                else:
                         print("❌ ArthaLens screenshots capture failed")
                 except Exception as e:
                     print(f"❌ ArthaLens task error: {e}")
@@ -4340,19 +4340,19 @@ The analysis provides a holistic view of {ticker} considering both quantitative 
             def task_chart():
                 result = {}
                 try:
-                    if stock_data.ohlcv_data is not None and len(stock_data.ohlcv_data) > 0:
+            if stock_data.ohlcv_data is not None and len(stock_data.ohlcv_data) > 0:
                         chart_filename = self.technical_agent._create_candlestick_chart(stock_data)
                         if chart_filename:
-                            chart_path = os.path.join(screenshots_dir, f"candlestick_{ticker.replace('.NS', '')}.png")
+                    chart_path = os.path.join(screenshots_dir, f"candlestick_{ticker.replace('.NS', '')}.png")
                             # Move the chart from current directory to screenshots directory
                             if os.path.exists(chart_filename):
                                 import shutil
                                 shutil.move(chart_filename, chart_path)
                                 result['candlestick_chart'] = chart_path
                                 print(f"✅ Initial candlestick chart saved: {chart_path}")
-                            else:
+                else:
                                 print(f"⚠️ Chart file {chart_filename} not found")
-                    else:
+            else:
                         print("❌ No OHLCV data available for candlestick chart")
                 except Exception as e:
                     print(f"❌ Chart task error: {e}")

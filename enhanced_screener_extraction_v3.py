@@ -377,22 +377,22 @@ Return ONLY the JSON object, nothing else.
         chrome_options.add_argument("--disable-plugins")
         chrome_options.add_argument("--disable-images")
         
-        driver = webdriver.Chrome(options=chrome_options)
-        driver.set_page_load_timeout(30)
+            driver = webdriver.Chrome(options=chrome_options)
+            driver.set_page_load_timeout(30)
         return driver
     
     def _apply_optimizations(self, driver: webdriver.Chrome):
         """Apply CSS optimizations for better OCR"""
-        css_optimizations = """
-        <style>
-        body, html { background-color: #FFFFFF !important; }
-        th, td { border: 1px solid #ddd !important; padding: 4px !important; }
-        * { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important; }
-        table { background-color: #FFFFFF !important; color: #000000 !important; }
-        .container, .content { padding: 20px !important; }
-        </style>
-        """
-        driver.execute_script(f"document.head.insertAdjacentHTML('beforeend', `{css_optimizations}`);")
+            css_optimizations = """
+            <style>
+            body, html { background-color: #FFFFFF !important; }
+            th, td { border: 1px solid #ddd !important; padding: 4px !important; }
+            * { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important; }
+            table { background-color: #FFFFFF !important; color: #000000 !important; }
+            .container, .content { padding: 20px !important; }
+            </style>
+            """
+            driver.execute_script(f"document.head.insertAdjacentHTML('beforeend', `{css_optimizations}`);")
     
     def _detect_section_coordinates(self, driver: webdriver.Chrome, section_name: str) -> Optional[Dict]:
         """Enhanced section coordinate detection including table content"""
@@ -509,18 +509,18 @@ Return ONLY the JSON object, nothing else.
             
             # Try enhanced dynamic coordinate detection first
             section_coords = self._detect_section_coordinates(driver, section_name)
-            
-            # Capture full screenshot
-            screenshot = driver.get_screenshot_as_png()
-            nparr = np.frombuffer(screenshot, np.uint8)
-            img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
-            
-            if img is None or img.size == 0:
+                    
+                    # Capture full screenshot
+                    screenshot = driver.get_screenshot_as_png()
+                    nparr = np.frombuffer(screenshot, np.uint8)
+                    img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+                    
+                    if img is None or img.size == 0:
                 return None
-            
-            # Get image dimensions
-            img_height, img_width = img.shape[:2]
-            
+                    
+                    # Get image dimensions
+                    img_height, img_width = img.shape[:2]
+                    
             # Determine cropping strategy
             if section_coords:
                 # Use enhanced dynamic coordinates
@@ -549,13 +549,13 @@ Return ONLY the JSON object, nothing else.
                 viewport_content_end = content_end_y - scroll_y
                 
                 # Use viewport-relative coordinates (accounting for device scale factor)
-                scale_factor = 2
+                    scale_factor = 2
                 y_start = int(viewport_content_start * scale_factor)
                 y_end = int(viewport_content_end * scale_factor)
-                
-                # Add padding and bounds checking
+                    
+                    # Add padding and bounds checking
                 padding = 30 * scale_factor
-                y_start = max(0, y_start - padding)
+                    y_start = max(0, y_start - padding)
                 y_end = min(img_height, y_end + padding)
                 height = y_end - y_start
                 
@@ -573,35 +573,35 @@ Return ONLY the JSON object, nothing else.
                 end_y = int(img_height * fallback_crop[1])
                 cropped_img = img[start_y:end_y, :]
                 print(f"📏 Using fallback crop for {section_name}: {fallback_crop[0]:.1%}-{fallback_crop[1]:.1%}")
-            
-            if cropped_img is None or cropped_img.size == 0:
+                    
+                    if cropped_img is None or cropped_img.size == 0:
                 return None
-            
-            # Pre-process for OCR
-            if len(cropped_img.shape) == 3:
-                gray = cv2.cvtColor(cropped_img, cv2.COLOR_BGR2GRAY)
-            else:
-                gray = cropped_img.copy()
-            
+                    
+                    # Pre-process for OCR
+                    if len(cropped_img.shape) == 3:
+                        gray = cv2.cvtColor(cropped_img, cv2.COLOR_BGR2GRAY)
+                    else:
+                        gray = cropped_img.copy()
+                    
             # Enhanced preprocessing
-            # Despeckle and sharpen
-            despeckled = cv2.medianBlur(gray, 3)
-            gaussian = cv2.GaussianBlur(despeckled, (0, 0), 2.0)
-            sharpened = cv2.addWeighted(despeckled, 1.5, gaussian, -0.5, 0)
-            
-            # Add padding
-            processed_img = cv2.copyMakeBorder(sharpened, 20, 20, 20, 20, 
-                                            cv2.BORDER_CONSTANT, value=255)
-            
+                    # Despeckle and sharpen
+                    despeckled = cv2.medianBlur(gray, 3)
+                    gaussian = cv2.GaussianBlur(despeckled, (0, 0), 2.0)
+                    sharpened = cv2.addWeighted(despeckled, 1.5, gaussian, -0.5, 0)
+                    
+                    # Add padding
+                    processed_img = cv2.copyMakeBorder(sharpened, 20, 20, 20, 20, 
+                                                    cv2.BORDER_CONSTANT, value=255)
+                    
             # Save screenshot
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             filename = f"{section_name}_{timestamp}.png"
             filepath = os.path.join(output_dir, filename)
             
-            success = cv2.imwrite(filepath, processed_img, [cv2.IMWRITE_PNG_COMPRESSION, 0])
-            
-            if success:
-                file_size = os.path.getsize(filepath)
+                    success = cv2.imwrite(filepath, processed_img, [cv2.IMWRITE_PNG_COMPRESSION, 0])
+                    
+                    if success:
+                        file_size = os.path.getsize(filepath)
                 print(f"✅ {section_name}: {filename} ({file_size/1024:.1f} KB)")
                 return filepath
             
@@ -616,10 +616,10 @@ Return ONLY the JSON object, nothing else.
         max_retries = 2
         
         for attempt in range(max_retries):
-            try:
-                with open(screenshot_path, "rb") as image_file:
-                    image_data = base64.b64encode(image_file.read()).decode('utf-8')
-                
+                    try:
+                        with open(screenshot_path, "rb") as image_file:
+                            image_data = base64.b64encode(image_file.read()).decode('utf-8')
+                        
                 # Call OpenAI
                 model_name = os.getenv('OPENAI_MODEL','gpt-5')
                 
@@ -627,14 +627,14 @@ Return ONLY the JSON object, nothing else.
                 api_params = {
                     "model": model_name,
                     "messages": [
-                        {
-                            "role": "user",
-                            "content": [
+                                {
+                                    "role": "user",
+                                    "content": [
                                 {"type": "text", "text": section_config['prompt']},
-                                {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{image_data}"}}
-                            ]
-                        }
-                    ],
+                                        {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{image_data}"}}
+                                    ]
+                                }
+                            ],
                     # Significantly increase token limits for GPT-5 complex sections
                     "max_completion_tokens": 4000 if model_name.startswith('gpt-5') and section_name in ['quarterly', 'annual'] 
                                            else 3000 if model_name.startswith('gpt-5') 
@@ -649,8 +649,8 @@ Return ONLY the JSON object, nothing else.
                 response = self.client.chat.completions.create(**api_params)
                 
                 # Parse response with improved error handling for GPT-5
-                response_text = response.choices[0].message.content.strip()
-                
+                        response_text = response.choices[0].message.content.strip()
+                        
                 # Remove markdown code blocks if present
                 if response_text.startswith('```json'):
                     response_text = response_text.replace('```json', '').replace('```', '').strip()
@@ -669,9 +669,9 @@ Return ONLY the JSON object, nothing else.
                     
                     if json_start >= 0:
                         response_text = '\n'.join(lines[json_start:])
-                
-                try:
-                    data = json.loads(response_text)
+                        
+                        try:
+                            data = json.loads(response_text)
                 except json.JSONDecodeError as e:
                     print(f"⚠️ JSON parsing error for {section_name}: {str(e)}")
                     print(f"📝 Response preview: {response_text[:300]}...")
@@ -691,17 +691,17 @@ Return ONLY the JSON object, nothing else.
                                 data = json.loads(match)
                                 print(f"✅ Successfully extracted JSON from response for {section_name} using pattern")
                                 break
-                            except json.JSONDecodeError:
+                        except json.JSONDecodeError:
                                 continue
                         if 'data' in locals():
                             break
-                    else:
+                            else:
                         # If all parsing attempts fail, create a fallback structure
                         print(f"❌ All JSON parsing attempts failed for {section_name}")
                         if attempt < max_retries - 1:
                             print(f"⚠️ Retry {attempt + 1} for {section_name} due to JSON parsing error")
                             time.sleep(3)  # Longer wait for GPT-5
-                            continue
+                                continue
                         
                         # Create fallback data structure
                         data = {
@@ -723,8 +723,8 @@ Return ONLY the JSON object, nothing else.
                         continue
                     print(f"⚠️ Failed to validate {section_name}")
                     return None
-                    
-            except Exception as e:
+            
+        except Exception as e:
                 if attempt < max_retries - 1:
                     print(f"⚠️ Retry {attempt + 1} for {section_name} due to error: {e}")
                     time.sleep(1)
