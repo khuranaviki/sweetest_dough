@@ -140,7 +140,8 @@ CRITICAL INSTRUCTIONS:
 4. Also extract the column headers (quarter names) from the top row
 5. Preserve EXACT formatting including minus signs, commas, and decimal places
 6. If a cell is blank or unclear, write "NA"
-7. Return ONLY valid JSON format
+7. **MANDATORY**: Return ONLY a valid JSON object. Do not include any text before or after the JSON.
+8. **MANDATORY**: Do not wrap the JSON in markdown code blocks (```json or ```)
 
 EXTRACT THE FOLLOWING DATA:
 - Column Headers (Quarter Names) - extract from the top row of the table
@@ -150,7 +151,7 @@ EXTRACT THE FOLLOWING DATA:
 - Net Profit - look for "Net Profit" or "PAT" row
 - EBITDA - same as Operating Profit (Operating Profit = EBITDA)
 
-OUTPUT FORMAT:
+**JSON OUTPUT FORMAT** (start response immediately with { ):
 {
   "column_headers": ["Q1", "Q2", "Q3", "Q4", "Q5", "Q6", "Q7", "Q8"],
   "revenue": ["Q1", "Q2", "Q3", "Q4", "Q5", "Q6", "Q7", "Q8"],
@@ -199,7 +200,8 @@ CRITICAL INSTRUCTIONS:
 3. Also extract the column headers (year names) from the top row
 4. Preserve EXACT formatting including commas, minus signs, and decimal places
 5. If a value is not visible or unclear, write "NA"
-6. Return ONLY valid JSON format
+6. **MANDATORY**: Return ONLY a valid JSON object. Do not include any text before or after the JSON.
+7. **MANDATORY**: Do not wrap the JSON in markdown code blocks (```json or ```)
 
 EXTRACT THE FOLLOWING DATA:
 - Column Headers (Year Names) - extract from the top row of the table
@@ -621,7 +623,7 @@ Return ONLY the JSON object, nothing else.
                 # Call OpenAI
                 model_name = os.getenv('OPENAI_MODEL','gpt-5')
                 
-                # Prepare API parameters based on model
+                # Prepare API parameters based on model and section complexity
                 api_params = {
                     "model": model_name,
                     "messages": [
@@ -633,7 +635,11 @@ Return ONLY the JSON object, nothing else.
                             ]
                         }
                     ],
-                    "max_completion_tokens": 1000
+                    # Significantly increase token limits for GPT-5 complex sections
+                    "max_completion_tokens": 4000 if model_name.startswith('gpt-5') and section_name in ['quarterly', 'annual'] 
+                                           else 3000 if model_name.startswith('gpt-5') 
+                                           else 2000 if section_name in ['quarterly', 'annual'] 
+                                           else 1500
                 }
                 
                 # Add temperature only for non-GPT-5 models
@@ -642,21 +648,70 @@ Return ONLY the JSON object, nothing else.
                     
                 response = self.client.chat.completions.create(**api_params)
                 
-                # Parse response
+                # Parse response with improved error handling for GPT-5
                 response_text = response.choices[0].message.content.strip()
+                
+                # Remove markdown code blocks if present
+                if response_text.startswith('```json'):
+                    response_text = response_text.replace('```json', '').replace('```', '').strip()
+                elif response_text.startswith('```'):
+                    response_text = response_text.replace('```', '').strip()
+                
+                # Handle GPT-5 specific response patterns
+                if model_name.startswith('gpt-5'):
+                    # GPT-5 sometimes adds explanatory text before JSON
+                    lines = response_text.split('\n')
+                    json_start = -1
+                    for i, line in enumerate(lines):
+                        if line.strip().startswith('{'):
+                            json_start = i
+                            break
+                    
+                    if json_start >= 0:
+                        response_text = '\n'.join(lines[json_start:])
                 
                 try:
                     data = json.loads(response_text)
-                except json.JSONDecodeError:
-                    json_match = re.search(r'\{.*\}', response_text, re.DOTALL)
-                    if json_match:
-                        data = json.loads(json_match.group(0))
+                except json.JSONDecodeError as e:
+                    print(f"⚠️ JSON parsing error for {section_name}: {str(e)}")
+                    print(f"📝 Response preview: {response_text[:300]}...")
+                    
+                    # Enhanced JSON extraction patterns for GPT-5
+                    json_patterns = [
+                        r'\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}',  # Simple nested JSON
+                        r'\{.*?\}(?=\s*$)',  # JSON at end of response
+                        r'(\{[\s\S]*\})',   # Any JSON structure (greedy)
+                        r'\{.*\}',          # Fallback pattern
+                    ]
+                    
+                    for pattern in json_patterns:
+                        json_matches = re.findall(pattern, response_text, re.DOTALL)
+                        for match in json_matches:
+                            try:
+                                data = json.loads(match)
+                                print(f"✅ Successfully extracted JSON from response for {section_name} using pattern")
+                                break
+                            except json.JSONDecodeError:
+                                continue
+                        if 'data' in locals():
+                            break
                     else:
+                        # If all parsing attempts fail, create a fallback structure
+                        print(f"❌ All JSON parsing attempts failed for {section_name}")
                         if attempt < max_retries - 1:
                             print(f"⚠️ Retry {attempt + 1} for {section_name} due to JSON parsing error")
-                            time.sleep(1)
+                            time.sleep(3)  # Longer wait for GPT-5
                             continue
-                        return None
+                        
+                        # Create fallback data structure
+                        data = {
+                            "error": "JSON parsing failed",
+                            "raw_response": response_text[:1000],  # Store more of the response
+                            "extraction_status": "partial_failure",
+                            "model_used": model_name
+                        }
+                        print(f"🔄 Using fallback data structure for {section_name}")
+                        return data
                 
                 # Validate data
                 if self._validate_section_data(data, section_name, section_config):

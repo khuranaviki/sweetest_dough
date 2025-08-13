@@ -3644,6 +3644,8 @@ Key Growth Insights:
             Highlight any significant discrepancies between actual performance and management narrative.
             """
             
+            # Create OpenAI API call
+            print(f"🔄 Making OpenAI API call for correlation analysis...")
             response = self.openai_client.chat.completions.create(
                 model=os.getenv('OPENAI_MODEL', 'gpt-5'),
                 messages=[
@@ -3655,9 +3657,12 @@ Key Growth Insights:
                 max_completion_tokens=2000
             )
             
+            print(f"✅ OpenAI API call completed successfully")
+            
             # Track the API call usage
             if hasattr(response, 'usage'):
                 usage = response.usage
+                print(f"📊 API Usage: {usage.prompt_tokens} prompt + {usage.completion_tokens} completion = {usage.total_tokens} total tokens")
                 self.cost_tracker.log_usage(
                     model=os.getenv('OPENAI_MODEL', 'gpt-5'),
                     prompt_tokens=usage.prompt_tokens,
@@ -3667,6 +3672,8 @@ Key Growth Insights:
                 )
             
             correlated_insights = response.choices[0].message.content.strip()
+            print(f"📄 Response length: {len(correlated_insights)} characters")
+            print(f"📄 Response preview: {correlated_insights[:200]}...")
             
             return {
                 "analysis": correlated_insights,
@@ -3676,7 +3683,11 @@ Key Growth Insights:
             
         except Exception as e:
             print(f"❌ Error generating comprehensive correlated insights: {e}")
-            return {"error": str(e)}
+            print(f"❌ Error type: {type(e)}")
+            print(f"❌ Error details: {str(e)}")
+            import traceback
+            traceback.print_exc()
+            return {"error": str(e), "analysis": "", "generated_at": datetime.now().isoformat(), "quarters_analyzed": []}
     
     def _generate_comprehensive_report(self, analysis_data: Dict) -> str:
         """Generate comprehensive analysis report with specific outputs"""
@@ -4500,8 +4511,8 @@ The analysis provides a holistic view of {ticker} considering both quantitative 
                     arthalens_data = collected_data.get('arthalens_data', {})
                     
                     # Generate correlated insights
-                    correlated_insights = self.fundamental_agent._generate_comprehensive_correlated_insights(
-                        stock_data.ticker, analysis, arthalens_data
+                    correlated_insights = self._generate_comprehensive_correlated_insights(
+                        ticker, {'context': analysis_context}, arthalens_data
                     )
                     
                     # Convert to EnhancedFundamentalAnalysis format
@@ -4627,7 +4638,7 @@ The analysis provides a holistic view of {ticker} considering both quantitative 
             arthalens_data = collected_data.get('arthalens_data', {})
             
             # Generate correlated insights
-            correlated_insights = self.fundamental_agent._generate_comprehensive_correlated_insights(
+            correlated_insights = self._generate_comprehensive_correlated_insights(
                 ticker, {'context': analysis_context}, arthalens_data
             )
             

@@ -1,0 +1,30 @@
+{
+  "trend": "Bearish",
+  "support_levels": [
+    2990.0,
+    2900.0
+  ],
+  "resistance_levels": [
+    3150.0,
+    3245.0
+  ],
+  "entry_range": "\u20b93000-\u20b93080",
+  "short_term_target": "\u20b93335",
+  "medium_term_target": "\u20b93450",
+  "stop_loss": "\u20b92940",
+  "confidence_score": "Medium",
+  "indicators": {},
+  "patterns": [
+    "Descending channel (lower highs/lows)",
+    "Potential double bottom near \u20b93000 (unconfirmed)",
+    "Oversold near lower Bollinger Band",
+    "Death cross (50-DMA below 200-DMA)"
+  ],
+  "strategy_signals": [
+    "Mean-reversion long near \u20b93000 with tight stop",
+    "Add only on daily close above \u20b93250 (breakout confirmation)",
+    "Book partials near \u20b93335 and trail stop to protect gains",
+    "Avoid/exit longs on close below \u20b92990"
+  ],
+  "position_sizing": "2-3% of portfolio"
+}

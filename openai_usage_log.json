@@ -1626,5 +1626,104 @@
     "cost_inr": 0.08,
     "call_type": "chat",
     "description": "Comprehensive correlated insights for DELHIVERY.NS"
+  },
+  {
+    "model": "gpt-5",
+    "prompt_tokens": 1982,
+    "completion_tokens": 2000,
+    "total_tokens": 3982,
+    "timestamp": "2025-08-12 17:02:37.195484",
+    "cost_usd": 0.04991,
+    "cost_inr": 4.14,
+    "call_type": "chat",
+    "description": "Comprehensive correlated insights for TCS.NS"
+  },
+  {
+    "model": "gpt-5",
+    "prompt_tokens": 3485,
+    "completion_tokens": 2000,
+    "total_tokens": 5485,
+    "timestamp": "2025-08-12 17:28:59.198231",
+    "cost_usd": 0.057425,
+    "cost_inr": 4.77,
+    "call_type": "chat",
+    "description": "Comprehensive correlated insights for TCS.NS"
+  },
+  {
+    "model": "gpt-5",
+    "prompt_tokens": 2047,
+    "completion_tokens": 2000,
+    "total_tokens": 4047,
+    "timestamp": "2025-08-12 17:47:10.981712",
+    "cost_usd": 0.050235,
+    "cost_inr": 4.17,
+    "call_type": "chat",
+    "description": "Comprehensive correlated insights for TCS.NS"
+  },
+  {
+    "model": "gpt-5",
+    "prompt_tokens": 3154,
+    "completion_tokens": 2000,
+    "total_tokens": 5154,
+    "timestamp": "2025-08-12 21:28:02.013804",
+    "cost_usd": 0.05577,
+    "cost_inr": 4.63,
+    "call_type": "chat",
+    "description": "Comprehensive correlated insights for KOTAKBANK.NS"
+  },
+  {
+    "model": "gpt-4o-mini",
+    "prompt_tokens": 2070,
+    "completion_tokens": 1257,
+    "total_tokens": 3327,
+    "timestamp": "2025-08-13 11:29:30.903631",
+    "cost_usd": 0.001065,
+    "cost_inr": 0.09,
+    "call_type": "chat",
+    "description": "Comprehensive correlated insights for RELIANCE.NS"
+  },
+  {
+    "model": "gpt-4o-mini",
+    "prompt_tokens": 1383,
+    "completion_tokens": 1483,
+    "total_tokens": 2866,
+    "timestamp": "2025-08-13 11:40:39.348199",
+    "cost_usd": 0.001097,
+    "cost_inr": 0.09,
+    "call_type": "chat",
+    "description": "Comprehensive correlated insights for RELIANCE.NS"
+  },
+  {
+    "model": "gpt-4o-mini",
+    "prompt_tokens": 2037,
+    "completion_tokens": 1450,
+    "total_tokens": 3487,
+    "timestamp": "2025-08-13 11:59:41.050363",
+    "cost_usd": 0.001176,
+    "cost_inr": 0.1,
+    "call_type": "chat",
+    "description": "Comprehensive correlated insights for RELIANCE.NS"
+  },
+  {
+    "model": "gpt-4o-mini",
+    "prompt_tokens": 1428,
+    "completion_tokens": 1230,
+    "total_tokens": 2658,
+    "timestamp": "2025-08-13 12:37:03.951660",
+    "cost_usd": 0.000952,
+    "cost_inr": 0.08,
+    "call_type": "chat",
+    "description": "Comprehensive correlated insights for RELIANCE.NS"
+  },
+  {
+    "model": "gpt-4o-mini",
+    "prompt_tokens": 1138,
+    "completion_tokens": 1367,
+    "total_tokens": 2505,
+    "timestamp": "2025-08-13 12:37:25.619785",
+    "cost_usd": 0.000991,
+    "cost_inr": 0.08,
+    "call_type": "chat",
+    "description": "Comprehensive correlated insights for RELIANCE.NS"
   }
 ]

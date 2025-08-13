@@ -14,14 +14,18 @@ import os
 import json
 import time
 import pandas as pd
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Dict, List, Optional
 import base64
 from io import BytesIO
 import threading
 import queue
-
-# LangChain imports
+import numpy as np
+import glob
+import plotly.graph_objects as go
+import plotly.express as px
+from plotly.subplots import make_subplots
+import yfinance as yf
 from langchain_openai import ChatOpenAI
 from langchain.schema import HumanMessage, AIMessage, SystemMessage
 from langchain.memory import ConversationBufferMemory
@@ -31,9 +35,340 @@ from langchain.prompts import PromptTemplate
 # Local imports
 from EnhancedMultiAgent import EnhancedMultiAgentStockAnalysis
 from openai_cost_tracker import OpenAICostTracker
+from reportlab.lib.pagesizes import letter, A4
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.units import inch
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image, PageBreak, Table, TableStyle
+from reportlab.lib import colors
+from reportlab.lib.enums import TA_LEFT, TA_CENTER, TA_JUSTIFY
+import textwrap
 
 # Initialize cost tracker once at module level
-cost_tracker = OpenAICostTracker()
+try:
+    cost_tracker = OpenAICostTracker()
+except Exception as e:
+    st.error(f"Failed to initialize cost tracker: {e}")
+    cost_tracker = None
+
+def export_analysis_to_pdf(analysis_data: dict, ticker: str) -> BytesIO:
+    """
+    Export complete analysis data to a comprehensive PDF report
+    """
+    buffer = BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=A4,
+                           rightMargin=72, leftMargin=72,
+                           topMargin=72, bottomMargin=18)
+    
+    # Build story content
+    story = []
+    styles = getSampleStyleSheet()
+    
+    # Custom styles
+    title_style = ParagraphStyle(
+        'CustomTitle',
+        parent=styles['Heading1'],
+        fontSize=24,
+        spaceAfter=30,
+        alignment=TA_CENTER,
+        textColor=colors.darkblue
+    )
+    
+    heading_style = ParagraphStyle(
+        'CustomHeading',
+        parent=styles['Heading2'],
+        fontSize=16,
+        spaceAfter=12,
+        spaceBefore=20,
+        textColor=colors.darkblue
+    )
+    
+    subheading_style = ParagraphStyle(
+        'CustomSubHeading',
+        parent=styles['Heading3'],
+        fontSize=14,
+        spaceAfter=8,
+        spaceBefore=12,
+        textColor=colors.blue
+    )
+    
+    # Title page
+    story.append(Paragraph(f"📊 Stock Analysis Report", title_style))
+    story.append(Paragraph(f"🏢 {ticker}", title_style))
+    story.append(Spacer(1, 12))
+    story.append(Paragraph(f"📅 Generated on: {datetime.now().strftime('%B %d, %Y at %I:%M %p')}", styles['Normal']))
+    story.append(Spacer(1, 12))
+    
+    # Executive Summary
+    story.append(Paragraph("📋 EXECUTIVE SUMMARY", heading_style))
+    
+    # Recommendation - Fix key name and structure
+    if 'final_recommendation' in analysis_data:
+        rec = analysis_data['final_recommendation']
+        story.append(Paragraph("🎯 Investment Recommendation", subheading_style))
+        
+        if isinstance(rec, dict):
+            action = rec.get('action', 'N/A')
+            confidence = rec.get('confidence_level', 'N/A')
+            target_price = rec.get('target_price', 'N/A')
+            
+            # Color code the action
+            action_color = colors.green if action == 'BUY' else colors.orange if action == 'HOLD' else colors.red
+            story.append(Paragraph(f"<font color='{action_color}'>Action: {action}</font>", styles['Normal']))
+            story.append(Paragraph(f"Confidence: {confidence}", styles['Normal']))
+            story.append(Paragraph(f"Target Price: {target_price}", styles['Normal']))
+            story.append(Paragraph(f"Entry Price: {rec.get('entry_price', 'N/A')}", styles['Normal']))
+            story.append(Paragraph(f"Stop Loss: {rec.get('stop_loss', 'N/A')}", styles['Normal']))
+            story.append(Paragraph(f"Time Horizon: {rec.get('time_horizon', 'N/A')}", styles['Normal']))
+            
+            # Key risks
+            if 'key_risks' in rec and rec['key_risks']:
+                story.append(Paragraph("Key Risks:", subheading_style))
+                for risk in rec['key_risks']:
+                    story.append(Paragraph(f"• {risk}", styles['Normal']))
+                    
+            # Fundamental reasoning
+            if 'fundamental_reasons' in rec and rec['fundamental_reasons']:
+                story.append(Paragraph("Investment Reasoning:", subheading_style))
+                # Split long text into paragraphs
+                reasoning_parts = rec['fundamental_reasons'].split('\n\n')
+                for part in reasoning_parts:
+                    if part.strip():
+                        story.append(Paragraph(part.strip(), styles['Normal']))
+                        story.append(Spacer(1, 6))
+        else:
+            story.append(Paragraph(str(rec), styles['Normal']))
+    
+    story.append(PageBreak())
+    
+    # Technical Analysis
+    if 'technical_analysis' in analysis_data:
+        story.append(Paragraph("📈 TECHNICAL ANALYSIS", heading_style))
+        tech = analysis_data['technical_analysis']
+        
+        if isinstance(tech, dict):
+            # Key metrics
+            current_price = tech.get('current_price', 'N/A')
+            trend = tech.get('trend', 'N/A')
+            support = tech.get('support_levels', [])
+            resistance = tech.get('resistance_levels', [])
+            
+            story.append(Paragraph(f"Current Price: ₹{current_price}", styles['Normal']))
+            story.append(Paragraph(f"Trend: {trend}", styles['Normal']))
+            
+            if support:
+                story.append(Paragraph(f"Support Levels: {', '.join([f'₹{s}' for s in support[:3]])}", styles['Normal']))
+            if resistance:
+                story.append(Paragraph(f"Resistance Levels: {', '.join([f'₹{r}' for r in resistance[:3]])}", styles['Normal']))
+            
+            # Technical indicators
+            story.append(Paragraph("Technical Indicators:", subheading_style))
+            
+            indicators = ['rsi', 'moving_averages', 'bollinger_bands', 'volume_analysis']
+            for indicator in indicators:
+                if indicator in tech:
+                    value = tech[indicator]
+                    if isinstance(value, dict):
+                        story.append(Paragraph(f"{indicator.replace('_', ' ').title()}:", styles['Normal']))
+                        for k, v in value.items():
+                            story.append(Paragraph(f"  • {k}: {v}", styles['Normal']))
+                    else:
+                        story.append(Paragraph(f"{indicator.replace('_', ' ').title()}: {value}", styles['Normal']))
+        
+        story.append(PageBreak())
+    
+    # Add Candlestick Chart
+    story.append(Paragraph("📊 CANDLESTICK CHART", heading_style))
+    
+    # Try to find and include the candlestick chart
+    chart_found = False
+    
+    # Look for chart in the current analysis data directory structure
+    if 'run_directory' in analysis_data:
+        chart_path = os.path.join(analysis_data['run_directory'], 'screenshots', f'candlestick_{ticker}.png')
+    else:
+        # Try to find the latest analysis run directory
+        analysis_dirs = glob.glob(os.path.join(os.getcwd(), 'analysis_runs/*/screenshots/candlestick_*.png'))
+        if analysis_dirs:
+            # Get the most recent one
+            chart_path = max(analysis_dirs, key=os.path.getctime)
+        else:
+            chart_path = None
+    
+    if chart_path and os.path.exists(chart_path):
+        try:
+            # Add the chart image to PDF
+            chart_img = Image(chart_path, width=500, height=300)
+            story.append(chart_img)
+            story.append(Paragraph("📊 Technical candlestick chart with support, resistance, and target levels", styles['Normal']))
+            chart_found = True
+        except Exception as e:
+            print(f"❌ Error adding chart to PDF: {e}")
+    
+    if not chart_found:
+        story.append(Paragraph("📊 Candlestick chart not available for this analysis.", styles['Normal']))
+    
+    story.append(PageBreak())
+    
+    # Fundamental Analysis
+    if 'enhanced_fundamental_data' in analysis_data or 'fundamental_analysis' in analysis_data:
+        story.append(Paragraph("💰 FUNDAMENTAL ANALYSIS", heading_style))
+        
+        # Use enhanced fundamental data if available, otherwise fall back to fundamental_analysis
+        fund = analysis_data.get('enhanced_fundamental_data', analysis_data.get('fundamental_analysis', {}))
+        basic_fund = analysis_data.get('fundamental_analysis', {})
+        
+        # Key Metrics from enhanced_fundamental_data
+        if isinstance(fund, dict) and fund:
+            story.append(Paragraph("Key Financial Metrics:", subheading_style))
+            
+            key_fields = [
+                ('market_cap', 'Market Cap'),
+                ('pe_ratio', 'P/E Ratio'), 
+                ('roe', 'ROE'),
+                ('roce', 'ROCE'),
+                ('book_value', 'Book Value'),
+                ('dividend_yield', 'Dividend Yield')
+            ]
+            
+            for field, label in key_fields:
+                if field in fund and fund[field]:
+                    value = fund[field]
+                    story.append(Paragraph(f"{label}: {value}", styles['Normal']))
+        
+        # Basic fundamental metrics from fundamental_analysis
+        if isinstance(basic_fund, dict) and basic_fund:
+            story.append(Paragraph("Business Analysis:", subheading_style))
+            
+            basic_fields = [
+                ('business_quality', 'Business Quality'),
+                ('market_penetration', 'Market Penetration'),
+                ('pricing_power', 'Pricing Power'),
+                ('revenue_growth', 'Revenue Growth'),
+                ('profit_growth', 'Profit Growth'),
+                ('debt_to_equity', 'Debt to Equity'),
+                ('valuation_status', 'Valuation Status'),
+                ('financial_health', 'Financial Health'),
+                ('multibagger_potential', 'Multibagger Potential')
+            ]
+            
+            for field, label in basic_fields:
+                if field in basic_fund and basic_fund[field]:
+                    value = basic_fund[field]
+                    story.append(Paragraph(f"{label}: {value}", styles['Normal']))
+        
+        # Quarterly Results from enhanced_fundamental_data
+        if 'quarterly_revenue' in fund and isinstance(fund['quarterly_revenue'], list):
+            story.append(Paragraph("📊 Quarterly Performance (Last 4Q):", subheading_style))
+            
+            # Display column headers
+            if 'quarterly_column_headers' in fund and fund['quarterly_column_headers']:
+                headers = fund['quarterly_column_headers'][:4]  # Last 4 quarters
+                story.append(Paragraph(f"Time Periods: {' | '.join(headers)}", styles['Normal']))
+                story.append(Spacer(1, 6))
+            
+            # Display quarterly data
+            revenue = fund['quarterly_revenue'][:4] if fund.get('quarterly_revenue') else []
+            profit = fund['quarterly_net_profit'][:4] if fund.get('quarterly_net_profit') else []
+            
+            if revenue:
+                story.append(Paragraph(f"Revenue (₹Cr): {' | '.join([f'₹{r}' for r in revenue])}", styles['Normal']))
+            if profit:
+                story.append(Paragraph(f"Net Profit (₹Cr): {' | '.join([f'₹{p}' for p in profit])}", styles['Normal']))
+        
+        # Annual Results from enhanced_fundamental_data
+        if 'annual_total_revenue' in fund and fund['annual_total_revenue']:
+            story.append(Paragraph("📈 Annual Performance:", subheading_style))
+            
+            annual_fields = [
+                ('annual_total_revenue', 'Total Revenue'),
+                ('annual_total_expenses', 'Total Expenses'),
+                ('annual_operating_profit', 'Operating Profit'),
+                ('annual_net_profit', 'Net Profit')
+            ]
+            
+            for field, label in annual_fields:
+                if field in fund and fund[field]:
+                    value = fund[field]
+                    story.append(Paragraph(f"{label}: ₹{value} Cr.", styles['Normal']))
+        
+        # Display fundamental analysis reasoning
+        if 'fundamental_reasons' in basic_fund and basic_fund['fundamental_reasons']:
+            story.append(Paragraph("📋 Detailed Analysis:", subheading_style))
+            reasoning_parts = basic_fund['fundamental_reasons'].split('\n\n')
+            for part in reasoning_parts:
+                if part.strip():
+                    story.append(Paragraph(part.strip(), styles['Normal']))
+                    story.append(Spacer(1, 6))
+        
+        story.append(PageBreak())
+    
+    # Strategy Analysis
+    if 'strategy_analysis' in analysis_data:
+        story.append(Paragraph("🎯 STRATEGY ANALYSIS", heading_style))
+        strategy = analysis_data['strategy_analysis']
+        
+        if isinstance(strategy, dict):
+            # Check if strategy analysis is available
+            if strategy.get('eligible', True):
+                for key, value in strategy.items():
+                    if key not in ['raw_data', 'eligible', 'category']:  # Skip raw data and meta fields
+                        label = key.replace('_', ' ').title()
+                        story.append(Paragraph(f"{label}:", subheading_style))
+                        
+                        if isinstance(value, dict):
+                            for k, v in value.items():
+                                story.append(Paragraph(f"• {k}: {v}", styles['Normal']))
+                        elif isinstance(value, list):
+                            for item in value:
+                                story.append(Paragraph(f"• {item}", styles['Normal']))
+                        else:
+                            story.append(Paragraph(str(value), styles['Normal']))
+            else:
+                # Strategy analysis not applicable
+                story.append(Paragraph("Strategy Analysis Status:", subheading_style))
+                story.append(Paragraph(f"Category: {strategy.get('category', 'N/A')}", styles['Normal']))
+                story.append(Paragraph(f"Eligible: {strategy.get('eligible', 'N/A')}", styles['Normal']))
+                if 'analysis_summary' in strategy:
+                    story.append(Paragraph("Summary:", subheading_style))
+                    story.append(Paragraph(strategy['analysis_summary'], styles['Normal']))
+        
+        story.append(PageBreak())
+    
+    # Correlation Analysis
+    if 'correlated_insights' in analysis_data:
+        story.append(Paragraph("🧠 CORRELATION ANALYSIS", heading_style))
+        corr = analysis_data['correlated_insights']
+        
+        if isinstance(corr, dict) and 'analysis' in corr:
+            # Use the analysis field which contains the detailed correlation insights
+            analysis_text = corr['analysis']
+            # Split into paragraphs for better formatting
+            paragraphs = analysis_text.split('\n\n')
+            for para in paragraphs:
+                if para.strip():
+                    # Clean up any markdown formatting
+                    cleaned_para = para.strip().replace('**', '').replace('###', '').replace('#', '')
+                    story.append(Paragraph(cleaned_para, styles['Normal']))
+                    story.append(Spacer(1, 6))
+        elif isinstance(corr, str):
+            # Split into paragraphs for better formatting
+            paragraphs = corr.split('\n\n')
+            for para in paragraphs:
+                if para.strip():
+                    story.append(Paragraph(para.strip(), styles['Normal']))
+                    story.append(Spacer(1, 6))
+        else:
+            story.append(Paragraph(str(corr), styles['Normal']))
+    
+    # Footer
+    story.append(Spacer(1, 20))
+    story.append(Paragraph("📝 Report generated by Enhanced Multi-Agent Stock Analysis System", styles['Italic']))
+    story.append(Paragraph(f"⚠️ This report is for informational purposes only and should not be considered as investment advice.", styles['Italic']))
+    
+    # Build PDF
+    doc.build(story)
+    buffer.seek(0)
+    return buffer
 
 # Page configuration
 st.set_page_config(
@@ -324,6 +659,7 @@ class EnhancedStockAnalysisChatApp:
             # Store results in session state
             st.session_state.analysis_data = analysis_results
             st.session_state.analysis_complete = True
+            st.session_state.show_analysis = True  # Show results immediately
             st.session_state.current_analysis = {
                 'company_name': company_name,
                 'ticker': ticker,
@@ -1507,6 +1843,63 @@ The strong correlation between current fundamental performance and management's 
                     st.session_state.show_analysis = False
                     st.success("✅ Data cleared!")
                     st.rerun()
+            
+            # PDF Export Section
+            st.markdown("---")
+            st.subheader("📄 Export Analysis")
+            
+            # Debug information
+            has_analysis_data = st.session_state.get('analysis_data') is not None
+            has_show_analysis = st.session_state.get('show_analysis', False)
+            has_analysis_complete = st.session_state.get('analysis_complete', False)
+            
+            # Check if we have analysis data to export
+            if st.session_state.get('analysis_data') and (st.session_state.get('show_analysis', False) or st.session_state.get('analysis_complete', False)):
+                analysis_data = st.session_state.analysis_data
+                
+                # Extract ticker from analysis data or directory name
+                ticker = "STOCK"
+                if 'run_directory' in analysis_data:
+                    # Extract ticker from directory name like "TCS_20250812_171158"
+                    dir_name = os.path.basename(analysis_data['run_directory'])
+                    ticker = dir_name.split('_')[0] if '_' in dir_name else ticker
+                
+                st.markdown(f"📊 **Current Analysis:** {ticker}")
+                
+                if st.button("📥 Export to PDF", type="primary"):
+                    try:
+                        with st.spinner("🔄 Generating PDF report..."):
+                            # Generate PDF
+                            pdf_buffer = export_analysis_to_pdf(analysis_data, ticker)
+                            
+                            # Create download filename
+                            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+                            filename = f"{ticker}_Analysis_Report_{timestamp}.pdf"
+                            
+                            # Offer download
+                            st.download_button(
+                                label="💾 Download PDF Report",
+                                data=pdf_buffer.getvalue(),
+                                file_name=filename,
+                                mime="application/pdf",
+                                type="primary"
+                            )
+                            
+                            st.success("✅ PDF generated successfully!")
+                            
+                    except Exception as e:
+                        st.error(f"❌ Failed to generate PDF: {str(e)}")
+                        st.error("Please ensure reportlab is installed: `pip install reportlab`")
+            else:
+                st.info("📋 Run an analysis first to enable PDF export")
+                # Debug information for troubleshooting
+                if st.checkbox("🔍 Show Debug Info"):
+                    st.write("**Debug Information:**")
+                    st.write(f"- Has analysis data: {has_analysis_data}")
+                    st.write(f"- Show analysis flag: {has_show_analysis}")  
+                    st.write(f"- Analysis complete flag: {has_analysis_complete}")
+                    if has_analysis_data:
+                        st.write(f"- Analysis data keys: {list(st.session_state.analysis_data.keys()) if st.session_state.analysis_data else 'None'}")
                 
             # Display cost estimate if available
             if st.session_state.cost_estimate:
@@ -1520,7 +1913,7 @@ The strong correlation between current fundamental performance and management's 
             self.display_data_collection()
             
         # Display analysis results if available (either from real analysis or test data)
-        if st.session_state.show_analysis and st.session_state.analysis_data:
+        if (st.session_state.get('show_analysis', False) or st.session_state.get('analysis_complete', False)) and st.session_state.get('analysis_data'):
             st.markdown("---")
             st.header("📊 Analysis Results")
             self.display_analysis_results(st.session_state.analysis_data)

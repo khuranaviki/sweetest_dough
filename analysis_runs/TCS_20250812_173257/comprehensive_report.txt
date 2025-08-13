@@ -1,0 +1,140 @@
+
+====================================================================================================
+COMPREHENSIVE STOCK ANALYSIS REPORT
+====================================================================================================
+
+📊 STOCK INFORMATION
+==================================================
+Ticker: TCS.NS
+Company: TCS
+Sector: General
+Category: Enhanced Analysis
+Analysis Date: 2025-08-12 17:47:10
+
+====================================================================================================
+📈 TECHNICAL ANALYSIS
+==================================================
+Trend: Bearish
+Support Levels: [2990.0, 2900.0]
+Resistance Levels: [3150.0, 3245.0]
+Entry Range: ₹3000-₹3080
+Short-term Target: ₹3335
+Medium-term Target: ₹3450
+Stop Loss: ₹2940
+Confidence Score: Medium
+
+Technical Indicators:
+Not Available
+
+Chart Patterns Identified:
+  • Descending channel (lower highs/lows)
+  • Potential double bottom near ₹3000 (unconfirmed)
+  • Oversold near lower Bollinger Band
+  • Death cross (50-DMA below 200-DMA)
+
+Strategy Signals:
+  • Mean-reversion long near ₹3000 with tight stop
+  • Add only on daily close above ₹3250 (breakout confirmation)
+  • Book partials near ₹3335 and trail stop to protect gains
+  • Avoid/exit longs on close below ₹2990
+
+====================================================================================================
+💰 FUNDAMENTAL ANALYSIS
+==================================================
+Business Quality: High
+Market Penetration: Strong
+Pricing Power: High
+Revenue Growth: +1.3% (3Y Avg: +4.1%)
+Profit Growth: +5.9% (3Y Avg: +5.5%)
+Debt to Equity: 1.68
+ROCE/ROE: ROCE: 64.6 %, ROE: 52.4 %
+Promoter Pledging: 71.77%
+Retail Shareholding: 4.77%
+Valuation Status: Fair
+Fair Value: ₹ 3,036
+Financial Health: Average
+Multibagger Potential: Moderate
+Confidence Score: Strong
+
+Fundamental Reasons for Buy Signal:
+Growth Analysis: Average growth quality (Score: 56/100).
+        
+Growth Highlights:
+• Positive revenue growth of +1.3% YoY
+• Positive net profit growth of +5.9% YoY
+
+Financial Metrics: Market Cap ₹ 10,98,433 Cr., ROCE 64.6 %, ROE 52.4 %, Revenue Growth +1.3% (3Y Avg: +4.1%), Profit Growth +5.9% (3Y Avg: +5.5%)
+
+Growth Metrics Detail:
+• Revenue YoY: +1.3%
+• Net Profit YoY: +5.9%
+• Operating Profit YoY: +1.3%
+• Revenue 3Y Avg: +4.1%
+• Profit 3Y Avg: +5.5%
+
+====================================================================================================
+📊 STRATEGY PERFORMANCE ANALYSIS
+==================================================
+Strategy Performance Analysis: Not applicable for Enhanced Analysis category stocks. Only V40 and V40 Next categories are eligible for strategy analysis.
+
+====================================================================================================
+🎯 FINAL RECOMMENDATION
+==================================================
+Action: HOLD
+Entry Price: ₹3000-₹3080
+Target Price: ₹3450
+Stop Loss: ₹2940
+Time Horizon: 3-6 months
+Confidence Level: Low (Basic Analysis)
+Risk Level: Medium
+Position Size: 1-2% of portfolio
+Strategy Used: Basic Analysis (Category: Enhanced Analysis)
+
+Key Risks:
+  • Market volatility
+  • Sector-specific risks
+  • Strategy performance may not repeat
+
+Fundamental Reasons for Buy Signal:
+Growth Analysis: Average growth quality (Score: 56/100).
+        
+Growth Highlights:
+• Positive revenue growth of +1.3% YoY
+• Positive net profit growth of +5.9% YoY
+
+Financial Metrics: Market Cap ₹ 10,98,433 Cr., ROCE 64.6 %, ROE 52.4 %, Revenue Growth +1.3% (3Y Avg: +4.1%), Profit Growth +5.9% (3Y Avg: +5.5%)
+
+Growth Metrics Detail:
+• Revenue YoY: +1.3%
+• Net Profit YoY: +5.9%
+• Operating Profit YoY: +1.3%
+• Revenue 3Y Avg: +4.1%
+• Profit 3Y Avg: +5.5%
+
+====================================================================================================
+📈 ARTHALENS CORRELATED INSIGHTS
+==================================================
+
+🧠 COMPREHENSIVE CORRELATED INSIGHTS:
+
+
+📊 CORRELATION SUMMARY:
+- Data Sources: ['Fundamental Analysis', 'ArthaLens Transcripts']
+- Quarters Analyzed: []
+- Generated At: 2025-08-12T17:47:10.989754
+
+====================================================================================================
+📊 ANALYSIS SUMMARY
+==================================================
+This comprehensive analysis combines:
+✅ Technical Analysis with advanced pattern recognition
+✅ Fundamental Analysis with Screener.in data extraction
+✅ Strategy Performance Analysis with historical backtesting
+✅ ArthaLens Transcript & Guidance Analysis
+✅ Correlated Insights between fundamental and management commentary
+✅ Growth Confidence and Valuation Assessment
+✅ Fundamental Metrics Correlation Analysis
+✅ Projected Growth Analysis
+
+The analysis provides a holistic view of TCS.NS considering both quantitative metrics and qualitative management insights.
+====================================================================================================

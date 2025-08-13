@@ -1,0 +1,93 @@
+{
+  "ticker": "RELIANCE.NS",
+  "company_name": "Reliance",
+  "sector": "General",
+  "market_cap": "\u20b9 18,69,037 Cr.",
+  "pe_ratio": "49.6x",
+  "book_value": "\u20b9 623",
+  "roce": "9.69 %",
+  "roe": "10%",
+  "quarterly_column_headers": [
+    "Mar 2025",
+    "Dec 2024",
+    "Sep 2024",
+    "Jun 2024",
+    "Mar 2024",
+    "Dec 2023",
+    "Sep 2023",
+    "Jun 2023"
+  ],
+  "quarterly_revenue": [
+    "261,388",
+    "239,986",
+    "231,784",
+    "231,535",
+    "236,533",
+    "225,086",
+    "231,886",
+    "207,559"
+  ],
+  "quarterly_expenses": [
+    "196,197",
+    "184,430",
+    "190,918",
+    "192,477",
+    "194,017",
+    "184,430",
+    "190,918",
+    "169,466"
+  ],
+  "quarterly_operating_profit": [
+    "43,832",
+    "12,903",
+    "13,181",
+    "13,596",
+    "42,516",
+    "40,656",
+    "40,968",
+    "38,093"
+  ],
+  "quarterly_net_profit": [
+    "21,930",
+    "19,641",
+    "19,378",
+    "17,445",
+    "27,720",
+    "25,833",
+    "26,493",
+    "18,258"
+  ],
+  "quarterly_ebitda": [
+    "43,832",
+    "12,903",
+    "13,181",
+    "13,596",
+    "42,516",
+    "40,656",
+    "40,968",
+    "38,093"
+  ],
+  "annual_column_headers": [
+    "Mar 2024",
+    "Mar 2023",
+    "Mar 2022",
+    "Mar 2021",
+    "Mar 2020"
+  ],
+  "annual_total_revenue": "899,041",
+  "annual_total_expenses": "794,701",
+  "annual_operating_profit": "104,340",
+  "annual_net_profit": "79,020",
+  "annual_ebitda": "104,340",
+  "total_assets": "1,605,882",
+  "total_liabilities": "1,498,622",
+  "net_worth": "NA",
+  "working_capital": "NA",
+  "operating_cf": "32,486",
+  "investing_cf": "-113,581",
+  "financing_cf": "28,561",
+  "promoter_holding": "50.27%",
+  "fii_shareholding": "22.60%",
+  "dii_shareholding": "15.99%",
+  "retail_shareholding": "10.98%"
+}

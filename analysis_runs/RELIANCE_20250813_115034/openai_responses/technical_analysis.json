@@ -1,0 +1,24 @@
+{
+  "trend": "Bullish",
+  "support_levels": [
+    1361.2
+  ],
+  "resistance_levels": [
+    1489.6
+  ],
+  "entry_range": "\u20b91360-\u20b91380",
+  "short_term_target": "\u20b91500",
+  "medium_term_target": "\u20b91518",
+  "stop_loss": "\u20b91340",
+  "confidence_score": "Medium",
+  "indicators": {},
+  "patterns": [
+    "Ascending Triangle",
+    "Bollinger Band Squeeze"
+  ],
+  "strategy_signals": [
+    "Buy on dips",
+    "Momentum trading"
+  ],
+  "position_sizing": "5% of portfolio"
+}

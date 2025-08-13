@@ -148,9 +148,12 @@ class OpenAICostTracker:
         
         pricing = self.PRICING[model]
         
-        # Calculate token costs
-        input_cost = (prompt_tokens / 1000) * pricing["input"]
-        output_cost = (completion_tokens / 1000) * pricing["output"]
+        # Calculate token costs - handle different key naming conventions
+        input_key = "input_per_1k" if "input_per_1k" in pricing else "input"
+        output_key = "output_per_1k" if "output_per_1k" in pricing else "output"
+        
+        input_cost = (prompt_tokens / 1000) * pricing[input_key]
+        output_cost = (completion_tokens / 1000) * pricing[output_key]
         
         # Add image costs if applicable
         image_cost = 0

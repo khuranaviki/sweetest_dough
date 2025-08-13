@@ -1,0 +1,222 @@
+{
+  "ticker": "KOTAKBANK.NS",
+  "company_name": "Kotak Bank",
+  "sector": "Banking & Finance",
+  "category": "Enhanced Analysis",
+  "analysis_timestamp": "2025-08-12T21:28:02.027349",
+  "technical_analysis": {
+    "trend": "Sideways",
+    "support_levels": [
+      1980.0,
+      1935.0,
+      1900.0
+    ],
+    "resistance_levels": [
+      2050.0,
+      2155.0,
+      2190.0
+    ],
+    "entry_range": "\u20b91950-\u20b91985",
+    "short_term_target": "\u20b92050",
+    "medium_term_target": "\u20b92155",
+    "stop_loss": "\u20b91910",
+    "confidence_score": "Medium",
+    "indicators": {},
+    "patterns": [
+      "Pullback to 200-DMA support",
+      "Double top near \u20b92185-\u20b92200",
+      "Bollinger lower-band touch/mean reversion",
+      "MA20 < MA50 (short-term bearish crossover)"
+    ],
+    "strategy_signals": [
+      "Accumulate near \u20b91950-\u20b91985 with stop \u20b91910",
+      "Add on close above \u20b92060 for momentum toward \u20b92155",
+      "Trail stop to \u20b91985 after breakout; avoid longs on close below \u20b91935"
+    ],
+    "position_sizing": "3-5% of portfolio"
+  },
+  "fundamental_analysis": {
+    "business_quality": "Low",
+    "market_penetration": "Strong",
+    "pricing_power": "Medium",
+    "revenue_growth": "+8.9% (3Y Avg: +11.4%)",
+    "profit_growth": "-40.0% (3Y Avg: -12.4%)",
+    "debt_to_equity": "5.62",
+    "roce_roe": "ROCE: 8.17 %, ROE: 15.4 %",
+    "promoter_pledging": "25.88%",
+    "retail_shareholding": "12.18%",
+    "valuation_status": "Fair",
+    "fair_value": "\u20b9 1,959",
+    "financial_health": "Poor",
+    "multibagger_potential": "Low",
+    "fundamental_reasons": "Growth Analysis: Poor growth quality (Score: 37/100).\n        \nGrowth Highlights:\n\u2022 Positive revenue growth of +8.9% YoY\n\u2022 Severe profit decline of -40.0% YoY\n\u2022 Declining operations with -5.3% EBITDA contraction\n\nFinancial Metrics: Market Cap \u20b9 3,89,338 Cr., ROCE 8.17 %, ROE 15.4 %, Revenue Growth +8.9% (3Y Avg: +11.4%), Profit Growth -40.0% (3Y Avg: -12.4%)\n\nGrowth Metrics Detail:\n\u2022 Revenue YoY: +8.9%\n\u2022 Net Profit YoY: -40.0%\n\u2022 Operating Profit YoY: -5.3%\n\u2022 Revenue 3Y Avg: +11.4%\n\u2022 Profit 3Y Avg: -12.4%",
+    "confidence_score": "Strong"
+  },
+  "strategy_analysis": {
+    "error": "Strategy analysis not applicable for category: Enhanced Analysis",
+    "category": "Enhanced Analysis",
+    "eligible": false,
+    "analysis_summary": "Strategy Performance Analysis: Not applicable for Enhanced Analysis category stocks. Only V40 and V40 Next categories are eligible for strategy analysis."
+  },
+  "final_recommendation": {
+    "action": "HOLD",
+    "entry_price": "\u20b91950-\u20b91985",
+    "target_price": "\u20b92155",
+    "stop_loss": "\u20b91910",
+    "time_horizon": "3-6 months",
+    "confidence_level": "Low (Basic Analysis)",
+    "risk_level": "Medium",
+    "position_size": "1-2% of portfolio",
+    "strategy_used": "Basic Analysis (Category: Enhanced Analysis)",
+    "key_risks": [
+      "Market volatility",
+      "Sector-specific risks",
+      "Strategy performance may not repeat"
+    ],
+    "fundamental_reasons": "Growth Analysis: Poor growth quality (Score: 37/100).\n        \nGrowth Highlights:\n\u2022 Positive revenue growth of +8.9% YoY\n\u2022 Severe profit decline of -40.0% YoY\n\u2022 Declining operations with -5.3% EBITDA contraction\n\nFinancial Metrics: Market Cap \u20b9 3,89,338 Cr., ROCE 8.17 %, ROE 15.4 %, Revenue Growth +8.9% (3Y Avg: +11.4%), Profit Growth -40.0% (3Y Avg: -12.4%)\n\nGrowth Metrics Detail:\n\u2022 Revenue YoY: +8.9%\n\u2022 Net Profit YoY: -40.0%\n\u2022 Operating Profit YoY: -5.3%\n\u2022 Revenue 3Y Avg: +11.4%\n\u2022 Profit 3Y Avg: -12.4%"
+  },
+  "arthalens_data": {
+    "future_guidance": "Here is all visible future guidance and outlook information from the full ArthaLens page for KOTAKBANK.NS (Q4 FY25), organized by your requested sections. If a topic is not disclosed on the page, it is explicitly marked as \u201cNot disclosed on this page.\u201d\n\nCompany/page context\n- Platform: ArthaLens (Beta v0.4)\n- Company: KOTAK MAHINDRA BANK LTD (Ticker: KOTAKBANK)\n- Sector: Finance \u2022 Major Banks\n- Price: \u20b91,959 (\u22120.86%) as of Aug 12, 3:45 PM IST\n- Market Cap: \u20b93,93,074.85 Cr\n- Page: Earnings Calls > Guidance (Q4 FY25)\n- Note displayed on page: \u201cThe \u2018Previous Guidance\u2019 column currently reflects information extracted only from this quarter\u2019s transcript. Data from previous quarters will be included in future platform updates.\u201d\n- Guidance table columns visible: Metric | Period | Previous Guidance | Current Guidance | Change\n- Single guidance row visible:\n  - Metric: Average advances\n  - Period: FY2026\n  - Previous Guidance: N/A\n  - Current Guidance: 1.5x to 2x nominal GDP growth (superscript references: 4, 18)\n  - Change: + new\n\n1) Revenue Guidance\n- Total revenue growth projections: Not disclosed on this page.\n- Segment-wise revenue outlook: Not disclosed on this page.\n- Geographic revenue expectations: Not disclosed on this page.\n- Product-wise revenue forecasts: Not disclosed on this page.\n\n2) Profitability Guidance\n- Margin improvement targets: Not disclosed on this page.\n- Cost optimization plans: Not disclosed on this page.\n- Profit growth projections: Not disclosed on this page.\n- EBITDA margin expectations: Not applicable/not disclosed on this page.\n\n3) Operational Guidance\n- Loan/advances growth:\n  - Average advances (FY2026): Guided to grow at 1.5x to 2x nominal GDP growth (marked as \u201c+ new\u201d; previous guidance N/A).\n- Capacity expansion plans: Not disclosed on this page.\n- Operational efficiency targets: Not disclosed on this page.\n- Market expansion strategies: Not disclosed on this page.\n- Customer acquisition goals: Not disclosed on this page.\n\n4) Investment and Capex Plans\n- Capital expenditure guidance: Not disclosed on this page.\n- Investment priorities: Not disclosed on this page.\n- R&D spending plans: Not disclosed on this page.\n- Technology investments: Not disclosed on this page.\n\n5) Market Outlook\n- Industry growth expectations: Not disclosed on this page.\n- Market share targets: Not disclosed on this page.\n- Competitive positioning: Not disclosed on this page.\n- Market opportunity assessment: Not disclosed on this page.\n\n6) Risk Factors\n- Key risks to guidance: Not disclosed on this page.\n- External factors affecting outlook: Not disclosed on this page.\n- Regulatory challenges: Not disclosed on this page.\n- Market uncertainties: Not disclosed on this page.\n\n7) Strategic Initiatives\n- New product launches: Not disclosed on this page.\n- Market entry plans: Not disclosed on this page.\n- Partnership strategies: Not disclosed on this page.\n- Digital transformation: Not disclosed on this page.\n\n8) Timeline and Milestones\n- Quarterly targets: Not disclosed on this page.\n- Annual goals:\n  - FY2026: Average advances growth target of 1.5x to 2x nominal GDP growth (new guidance).\n- Long-term objectives: Not disclosed on this page.\n- Key milestones: Not disclosed on this page.\n\nOther visible page elements (for completeness)\n- Tabs: Business Structure | Earnings Calls (active) | Risk Factors | Regulation Dependencies\n- Sub-tabs within Earnings Calls: Summary | Guidance (active) | Q&A\n- Controls: Quarter selector (Q4 FY25) with left/right arrows; \u201cTranscript PDF\u201d button\n- UI items: Thumbs up/down icons; \u201cRemaining Today: 50\u201d; \u201cCustom AI Prompt\u201d button\n- Search/Account UI: Company Info | Keyword Search (New) | Search bar | Changelog | Sign In\n\nSummary\n- The only explicit guidance item shown on this page is for Average advances in FY2026: 1.5x to 2x nominal GDP growth (new; no prior guidance shown). All other requested guidance/outlook categories are not disclosed on this specific page view.",
+    "transcript_summary": "Here is all the information visible in the provided full-page screenshot of the ArthaLens \u201cEarnings Calls\u201d (Transcript) tab for KOTAKBANK.NS (Q4 FY25), organized into clear sections. No transcript body content is visible in the screenshot; the content pane appears empty.\n\nPage header and navigation\n- Site/brand: ArthaLens (Beta v0.4)\n- Top navigation items:\n  - Company Info\n  - Keyword Search (labelled \u201cNew\u201d)\n  - Search bar placeholder: \u201cSearch companies\u2026\u201d\n  - Changelog\n  - Sign In\n- Company block:\n  - Name: KOTAK MAHINDRA BANK LTD\n  - Ticker and classification: KOTAKBANK \u2022 Finance \u2022 Major Banks\n  - Share price and change: \u20b91,959  -0.86%\n  - Timestamp next to price: Aug 12, 3:45 PM IST\n  - Market Cap: \u20b93,93,074.85 Cr\n- Section tabs below company block:\n  - Business Structure\n  - Earnings Calls (selected)\n  - Risk Factors\n  - Regulation Dependencies\n\nEarnings Calls \u2013 Transcript tab (Q4 FY25)\n- Section title: Earnings Call Analysis\n- Subtext: Comprehensive analysis of quarterly earnings calls\n- Controls:\n  - Left arrow \u201c<\u201d\n  - Quarter selector: Q4 FY25 (dropdown)\n  - Right arrow \u201c>\u201d\n  - Button: Transcript PDF\n  - Like/Dislike icons (thumbs up / thumbs down; no counts shown)\n  - Remaining Today: 50\n  - Button: Custom AI Prompt\n- Sub-tabs inside analysis:\n  - Summary\n  - Guidance\n  - Q&A\n- Content area status: Empty/blank (no transcript text or metrics displayed in the visible area)\n\nStructured extraction by requested categories\n\n1) Financial Data (visible on this page)\n- Market-related:\n  - Share Price: \u20b91,959\n  - Daily Change: -0.86%\n  - Timestamp: Aug 12, 3:45 PM IST\n  - Market Capitalization: \u20b93,93,074.85 Cr\n- Revenue, profit, margins: Not visible on this page\n- Growth rates and trends: Not visible on this page\n- Key performance indicators: Not visible on this page\n- Segment-wise performance: Not visible on this page\n\n2) Operational Data (visible on this page)\n- Business metrics: Not visible on this page\n- Operational efficiency: Not visible on this page\n- Market performance: Only the share price and daily change are visible (see Financial Data)\n- Customer data: Not visible on this page\n\n3) Strategic Information (visible on this page)\n- Management commentary: Not visible on this page\n- Strategic initiatives: Not visible on this page\n- Market outlook: Not visible on this page\n- Future plans: Not visible on this page\n\n4) Risk and Challenges (visible on this page)\n- Risk factors: Not visible on this page (there is a separate \u201cRisk Factors\u201d tab, but its contents are not shown here)\n- Operational challenges: Not visible on this page\n- Market risks: Not visible on this page\n- Competitive threats: Not visible on this page\n\nOther page elements and labels\n- Tabs available at the company level (but not selected in this screenshot): Business Structure, Risk Factors, Regulation Dependencies\n- Quarter shown: Q4 FY25\n- Available action: Transcript PDF (implies a downloadable PDF exists, but its contents are not displayed)\n- Additional UI text: Remaining Today: 50; Custom AI Prompt\n\nSummary\n- The screenshot confirms the company, ticker, sector, industry, market cap, share price, and date/time of quote.\n- The page is set to Earnings Calls > Q4 FY25 with options for Summary, Guidance, and Q&A, plus a Transcript PDF button.\n- No transcript content, financial line items, KPIs, guidance details, or risk commentary are visible in the content pane of this screenshot."
+  },
+  "correlated_insights": {
+    "analysis": "",
+    "generated_at": "2025-08-12T21:28:02.025050",
+    "quarters_analyzed": []
+  },
+  "run_directory": "analysis_runs/KOTAKBANK_20250812_211119",
+  "enhanced_fundamental_data": {
+    "ticker": "KOTAKBANK.NS",
+    "company_name": "Kotak Bank",
+    "sector": "Banking & Finance",
+    "market_cap": "\u20b9 3,89,338 Cr.",
+    "pe_ratio": "28.9x",
+    "pb_ratio": null,
+    "roe": "10%",
+    "roa": null,
+    "roce": "8.17 %",
+    "debt_to_equity": null,
+    "current_ratio": null,
+    "quick_ratio": null,
+    "interest_coverage": null,
+    "revenue_growth_3y": null,
+    "profit_growth_3y": null,
+    "revenue_growth_1y": null,
+    "profit_growth_1y": null,
+    "revenue_growth_qoq": null,
+    "profit_growth_qoq": null,
+    "book_value": "\u20b9 792",
+    "face_value": null,
+    "dividend_yield": "0.13%",
+    "dividend_payout_ratio": null,
+    "price_to_book": null,
+    "price_to_sales": null,
+    "ev_to_ebitda": null,
+    "quarterly_column_headers": [
+      "Jun 2025",
+      "Mar 2025",
+      "Dec 2024",
+      "Sep 2024",
+      "Jun 2024",
+      "Mar 2024",
+      "Dec 2023",
+      "Sep 2023"
+    ],
+    "quarterly_revenue": [
+      "17,248",
+      "16,772",
+      "16,633",
+      "16,427",
+      "15,837",
+      "15,156",
+      "14,495",
+      "13,717"
+    ],
+    "quarterly_expenses": [
+      "13,121",
+      "13,664",
+      "10,595",
+      "13,094",
+      "12,263",
+      "14,920",
+      "12,484",
+      "10,136"
+    ],
+    "quarterly_operating_profit": [
+      "NA",
+      "NA",
+      "NA",
+      "NA",
+      "NA",
+      "NA",
+      "NA",
+      "NA"
+    ],
+    "quarterly_net_profit": [
+      "4,472",
+      "4,933",
+      "4,701",
+      "5,044",
+      "7,448",
+      "5,337",
+      "4,265",
+      "4,461"
+    ],
+    "quarterly_ebitda": [
+      "NA",
+      "NA",
+      "NA",
+      "NA",
+      "NA",
+      "NA",
+      "NA",
+      "NA"
+    ],
+    "annual_column_headers": [
+      "Mar 2014",
+      "Mar 2015",
+      "Mar 2016",
+      "Mar 2017",
+      "Mar 2018",
+      "Mar 2019",
+      "Mar 2020",
+      "Mar 2021",
+      "Mar 2022",
+      "Mar 2023",
+      "Mar 2024",
+      "Mar 2025"
+    ],
+    "annual_total_revenue": "65,669",
+    "annual_total_expenses": "48,891",
+    "annual_operating_profit": "NA",
+    "annual_net_profit": "22,126",
+    "annual_ebitda": "NA",
+    "total_assets": "NA",
+    "total_liabilities": "879,774",
+    "net_worth": "156,495",
+    "working_capital": "NA",
+    "operating_cf": "16,916",
+    "investing_cf": "-25,226",
+    "financing_cf": "22,165",
+    "latest_quarter_revenue": null,
+    "latest_quarter_profit": null,
+    "latest_quarter_ebitda": null,
+    "latest_quarter_operating_margin": null,
+    "latest_quarter_net_margin": null,
+    "management_guidance": null,
+    "future_outlook": null,
+    "promoter_holding": "25.88%",
+    "promoter_pledging": null,
+    "retail_shareholding": "12.18%",
+    "institutional_shareholding": null,
+    "fii_shareholding": "32.34%",
+    "dii_shareholding": "29.61%",
+    "latest_filings": [
+      {
+        "headline": "Market analysis for Kotak Bank",
+        "sentiment": "Neutral",
+        "source": "Market Data"
+      }
+    ]
+  }
+}

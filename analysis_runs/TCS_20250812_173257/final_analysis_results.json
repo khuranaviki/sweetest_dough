@@ -1,0 +1,240 @@
+{
+  "ticker": "TCS.NS",
+  "company_name": "TCS",
+  "sector": "General",
+  "category": "Enhanced Analysis",
+  "analysis_timestamp": "2025-08-12T17:47:10.991657",
+  "technical_analysis": {
+    "trend": "Bearish",
+    "support_levels": [
+      2990.0,
+      2900.0
+    ],
+    "resistance_levels": [
+      3150.0,
+      3245.0
+    ],
+    "entry_range": "\u20b93000-\u20b93080",
+    "short_term_target": "\u20b93335",
+    "medium_term_target": "\u20b93450",
+    "stop_loss": "\u20b92940",
+    "confidence_score": "Medium",
+    "indicators": {},
+    "patterns": [
+      "Descending channel (lower highs/lows)",
+      "Potential double bottom near \u20b93000 (unconfirmed)",
+      "Oversold near lower Bollinger Band",
+      "Death cross (50-DMA below 200-DMA)"
+    ],
+    "strategy_signals": [
+      "Mean-reversion long near \u20b93000 with tight stop",
+      "Add only on daily close above \u20b93250 (breakout confirmation)",
+      "Book partials near \u20b93335 and trail stop to protect gains",
+      "Avoid/exit longs on close below \u20b92990"
+    ],
+    "position_sizing": "2-3% of portfolio"
+  },
+  "fundamental_analysis": {
+    "business_quality": "High",
+    "market_penetration": "Strong",
+    "pricing_power": "High",
+    "revenue_growth": "+1.3% (3Y Avg: +4.1%)",
+    "profit_growth": "+5.9% (3Y Avg: +5.5%)",
+    "debt_to_equity": "1.68",
+    "roce_roe": "ROCE: 64.6 %, ROE: 52.4 %",
+    "promoter_pledging": "71.77%",
+    "retail_shareholding": "4.77%",
+    "valuation_status": "Fair",
+    "fair_value": "\u20b9 3,036",
+    "financial_health": "Average",
+    "multibagger_potential": "Moderate",
+    "fundamental_reasons": "Growth Analysis: Average growth quality (Score: 56/100).\n        \nGrowth Highlights:\n\u2022 Positive revenue growth of +1.3% YoY\n\u2022 Positive net profit growth of +5.9% YoY\n\nFinancial Metrics: Market Cap \u20b9 10,98,433 Cr., ROCE 64.6 %, ROE 52.4 %, Revenue Growth +1.3% (3Y Avg: +4.1%), Profit Growth +5.9% (3Y Avg: +5.5%)\n\nGrowth Metrics Detail:\n\u2022 Revenue YoY: +1.3%\n\u2022 Net Profit YoY: +5.9%\n\u2022 Operating Profit YoY: +1.3%\n\u2022 Revenue 3Y Avg: +4.1%\n\u2022 Profit 3Y Avg: +5.5%",
+    "confidence_score": "Strong"
+  },
+  "strategy_analysis": {
+    "error": "Strategy analysis not applicable for category: Enhanced Analysis",
+    "category": "Enhanced Analysis",
+    "eligible": false,
+    "analysis_summary": "Strategy Performance Analysis: Not applicable for Enhanced Analysis category stocks. Only V40 and V40 Next categories are eligible for strategy analysis."
+  },
+  "final_recommendation": {
+    "action": "HOLD",
+    "entry_price": "\u20b93000-\u20b93080",
+    "target_price": "\u20b93450",
+    "stop_loss": "\u20b92940",
+    "time_horizon": "3-6 months",
+    "confidence_level": "Low (Basic Analysis)",
+    "risk_level": "Medium",
+    "position_size": "1-2% of portfolio",
+    "strategy_used": "Basic Analysis (Category: Enhanced Analysis)",
+    "key_risks": [
+      "Market volatility",
+      "Sector-specific risks",
+      "Strategy performance may not repeat"
+    ],
+    "fundamental_reasons": "Growth Analysis: Average growth quality (Score: 56/100).\n        \nGrowth Highlights:\n\u2022 Positive revenue growth of +1.3% YoY\n\u2022 Positive net profit growth of +5.9% YoY\n\nFinancial Metrics: Market Cap \u20b9 10,98,433 Cr., ROCE 64.6 %, ROE 52.4 %, Revenue Growth +1.3% (3Y Avg: +4.1%), Profit Growth +5.9% (3Y Avg: +5.5%)\n\nGrowth Metrics Detail:\n\u2022 Revenue YoY: +1.3%\n\u2022 Net Profit YoY: +5.9%\n\u2022 Operating Profit YoY: +1.3%\n\u2022 Revenue 3Y Avg: +4.1%\n\u2022 Profit 3Y Avg: +5.5%"
+  },
+  "arthalens_data": {
+    "transcript_summary": "Here is all the text and data visible in the provided full-page screenshot of ArthaLens for TCS.NS (Q4 FY25) \u2013 Transcript/Earnings Calls view, organized into clear sections. I\u2019ve also mapped what is and isn\u2019t present for the requested categories.\n\nExtracted visible content (verbatim, by page area)\n\n1) Top navigation and header\n- ArthaLens Beta v0.4\n- Company Info\n- Keyword Search New\n- Search companies\u2026\n- Changelog\n- Sign In\n- [Settings icon present]\n\n2) Company panel\n- TATA CONSULTANCY SERV LTD\n- TCS \u2022 Technology Services \u2022 Information Technology Services\n- \u20b93,035.4 -0.18% Aug 12, 3:45 PM IST\n- Market Cap \u20b911,00,025.24 Cr\n\n3) Section tabs (below company panel)\n- Business Structure\n- Earnings Calls [selected]\n- Risk Factors\n- Regulation Dependencies\n\n4) Earnings Calls page \u2013 header and controls\n- Earnings Call Analysis\n- Comprehensive analysis of quarterly earnings calls\n- [Left arrow] [Q4 FY25 \u25bc] [Right arrow]\n- Transcript PDF\n- [Thumbs up icon] [Thumbs down icon]\n- Remaining Today: 50\n- Custom AI Prompt\n\n5) Sub-tabs within Earnings Calls\n- Summary\n- Guidance\n- Q&A\n\n6) Content area\n- The main content pane under \u201cSummary / Guidance / Q&A\u201d is blank in the screenshot (no transcript text, tables, charts, or metrics are visible).\n\nMapping to your requested categories\n\nA) Financial Data\n- Visible on page:\n  - Share price: \u20b93,035.4\n  - Price change: -0.18%\n  - Timestamp: Aug 12, 3:45 PM IST\n  - Market capitalization: \u20b911,00,025.24 Cr\n- Not visible in the screenshot (no data shown):\n  - Revenue, profit, EBIT/EBITDA, margins\n  - Growth rates or trends\n  - KPIs (bookings, TCV, backlog, etc.)\n  - Segment-wise performance\n\nB) Operational Data\n- Not visible in the screenshot:\n  - Business metrics, utilization, attrition, hiring, headcount\n  - Operational efficiency metrics\n  - Market/regional performance\n  - Customer counts, additions, or logos\n\nC) Strategic Information\n- Not visible in the screenshot:\n  - Management commentary\n  - Strategic initiatives\n  - Market outlook\n  - Future plans or guidance details\n\nD) Risks and Challenges\n- Not visible in the screenshot:\n  - Risk factors\n  - Operational challenges\n  - Market risks\n  - Competitive threats\n\nPage-level observations and context\n- The \u201cEarnings Calls\u201d section is active with \u201cQ4 FY25\u201d selected, and the sub-tabs \u201cSummary / Guidance / Q&A\u201d are visible, but the transcript/analysis content area is empty in this capture.\n- A \u201cTranscript PDF\u201d button is present, implying the transcript can be accessed as a PDF, but its contents are not visible in the screenshot.\n- \u201cRemaining Today: 50\u201d and \u201cCustom AI Prompt\u201d indicate usage quota and an action button, respectively.\n\nIf you want the full Q4 FY25 and FY25 transcript details (financials, commentary, Q&A, risks), please:\n- Upload the subsequent screenshots that include the actual transcript/summary/guidance/Q&A content, or\n- Share/download the \u201cTranscript PDF\u201d and I can extract every figure and statement from it."
+  },
+  "correlated_insights": {
+    "analysis": "",
+    "generated_at": "2025-08-12T17:47:10.989754",
+    "quarters_analyzed": []
+  },
+  "run_directory": "analysis_runs/TCS_20250812_173257",
+  "enhanced_fundamental_data": {
+    "ticker": "TCS.NS",
+    "company_name": "TCS",
+    "sector": "General",
+    "market_cap": "\u20b9 10,98,433 Cr.",
+    "pe_ratio": "22.6x",
+    "pb_ratio": null,
+    "roe": "58.9%",
+    "roa": null,
+    "roce": "64.6 %",
+    "debt_to_equity": null,
+    "current_ratio": null,
+    "quick_ratio": null,
+    "interest_coverage": null,
+    "revenue_growth_3y": null,
+    "profit_growth_3y": null,
+    "revenue_growth_1y": null,
+    "profit_growth_1y": null,
+    "revenue_growth_qoq": null,
+    "profit_growth_qoq": null,
+    "book_value": "\u20b9 262",
+    "face_value": null,
+    "dividend_yield": "1.98%",
+    "dividend_payout_ratio": null,
+    "price_to_book": null,
+    "price_to_sales": null,
+    "ev_to_ebitda": null,
+    "quarterly_column_headers": [
+      "Jun 2025",
+      "Mar 2025",
+      "Dec 2024",
+      "Sep 2024",
+      "Jun 2024",
+      "Mar 2024",
+      "Dec 2023",
+      "Sep 2023"
+    ],
+    "quarterly_revenue": [
+      "63,437",
+      "64,479",
+      "63,973",
+      "64,259",
+      "62,613",
+      "61,237",
+      "60,583",
+      "59,692"
+    ],
+    "quarterly_expenses": [
+      "46,562",
+      "47,499",
+      "46,939",
+      "47,528",
+      "45,951",
+      "44,073",
+      "44,195",
+      "43,946"
+    ],
+    "quarterly_operating_profit": [
+      "16,875",
+      "16,980",
+      "17,034",
+      "16,731",
+      "16,662",
+      "17,164",
+      "16,388",
+      "15,746"
+    ],
+    "quarterly_net_profit": [
+      "12,819",
+      "12,293",
+      "12,444",
+      "11,955",
+      "12,105",
+      "12,502",
+      "11,097",
+      "11,380"
+    ],
+    "quarterly_ebitda": [
+      "16,875",
+      "16,980",
+      "17,034",
+      "16,731",
+      "16,662",
+      "17,164",
+      "16,388",
+      "15,746"
+    ],
+    "annual_column_headers": [
+      "Mar 2014",
+      "Mar 2015",
+      "Mar 2016",
+      "Mar 2017",
+      "Mar 2018",
+      "Mar 2019",
+      "Mar 2020",
+      "Mar 2021",
+      "Mar 2022",
+      "Mar 2023",
+      "Mar 2024",
+      "Mar 2025"
+    ],
+    "annual_total_revenue": "255,324",
+    "annual_total_expenses": "187,917",
+    "annual_operating_profit": "67,407",
+    "annual_net_profit": "48,797",
+    "annual_ebitda": "67,407",
+    "total_assets": "158,649",
+    "total_liabilities": "158,649",
+    "net_worth": "94,394",
+    "working_capital": "NA",
+    "operating_cf": "48,908",
+    "investing_cf": "-2,144",
+    "financing_cf": "-47,438",
+    "latest_quarter_revenue": null,
+    "latest_quarter_profit": null,
+    "latest_quarter_ebitda": null,
+    "latest_quarter_operating_margin": null,
+    "latest_quarter_net_margin": null,
+    "management_guidance": null,
+    "future_outlook": null,
+    "promoter_holding": "71.77%",
+    "promoter_pledging": null,
+    "retail_shareholding": "4.77%",
+    "institutional_shareholding": null,
+    "fii_shareholding": "11.48%",
+    "dii_shareholding": "11.95%",
+    "latest_filings": [
+      {
+        "headline": "TCS Share Price",
+        "sentiment": "Neutral",
+        "source": "economictimes.indiatimes.com"
+      },
+      {
+        "headline": "TCS Buy Or Sell?",
+        "sentiment": "Neutral",
+        "source": "economictimes.indiatimes.com"
+      },
+      {
+        "headline": "Expected Returns For TCS?",
+        "sentiment": "Neutral",
+        "source": "economictimes.indiatimes.com"
+      },
+      {
+        "headline": "TCS share price insights",
+        "sentiment": "Neutral",
+        "source": "economictimes.indiatimes.com"
+      },
+      {
+        "headline": "TCS Share Price Returns",
+        "sentiment": "Neutral",
+        "source": "economictimes.indiatimes.com"
+      }
+    ]
+  }
+}

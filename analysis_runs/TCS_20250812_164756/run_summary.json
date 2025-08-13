@@ -1,0 +1,16 @@
+{
+  "ticker": "TCS.NS",
+  "timestamp": "20250812_164756",
+  "run_directory": "analysis_runs/TCS_20250812_164756",
+  "data_collected": {
+    "screener_in": false,
+    "arthalens": true,
+    "candlestick_chart": true,
+    "ohlcv_data": true
+  },
+  "files": {
+    "screenshots_dir": "analysis_runs/TCS_20250812_164756/screenshots",
+    "openai_responses_dir": "analysis_runs/TCS_20250812_164756/openai_responses",
+    "ohlcv_file": "analysis_runs/TCS_20250812_164756/ohlcv_data.csv"
+  }
+}

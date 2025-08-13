@@ -1,0 +1,28 @@
+{
+  "trend": "Bearish",
+  "support_levels": [
+    2992.0,
+    2900.0
+  ],
+  "resistance_levels": [
+    3245.0,
+    3340.0
+  ],
+  "entry_range": "\u20b92980-\u20b93050",
+  "short_term_target": "\u20b93245",
+  "medium_term_target": "\u20b93339",
+  "stop_loss": "\u20b92910",
+  "confidence_score": "Medium",
+  "indicators": {},
+  "patterns": [
+    "Lower highs & lower lows sequence",
+    "Bearish MA stack (20<50<100<200)",
+    "Possible head-and-shoulders/rounded top breakdown",
+    "Price riding lower Bollinger band"
+  ],
+  "strategy_signals": [
+    "Counter-trend long: Accumulate near \u20b92980-\u20b93050 only on bullish reversal candle/RSI uptick; target \u20b93245 then \u20b93339; SL \u20b92910",
+    "Trend-following short: Sell on rise toward \u20b93245\u2013\u20b93340 if rejection appears; cover near \u20b93000; SL above \u20b93360"
+  ],
+  "position_sizing": "2-3% of portfolio"
+}

@@ -1,0 +1,24 @@
+{
+  "trend": "Bearish",
+  "support_levels": [
+    1361.2
+  ],
+  "resistance_levels": [
+    1489.6
+  ],
+  "entry_range": "\u20b91350-\u20b91375",
+  "short_term_target": "\u20b91400",
+  "medium_term_target": "\u20b91520",
+  "stop_loss": "\u20b91340",
+  "confidence_score": "Medium",
+  "indicators": {},
+  "patterns": [
+    "Head and Shoulders",
+    "Double Top"
+  ],
+  "strategy_signals": [
+    "Short on rally",
+    "Wait for confirmation"
+  ],
+  "position_sizing": "5% of portfolio"
+}

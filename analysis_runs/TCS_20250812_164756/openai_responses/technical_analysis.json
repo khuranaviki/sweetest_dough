@@ -1,0 +1,29 @@
+{
+  "trend": "Bearish",
+  "support_levels": [
+    2990.0,
+    2850.0
+  ],
+  "resistance_levels": [
+    3150.0,
+    3245.0
+  ],
+  "entry_range": "\u20b93000-\u20b93060",
+  "short_term_target": "\u20b93245",
+  "medium_term_target": "\u20b93339",
+  "stop_loss": "\u20b92950",
+  "confidence_score": "Medium",
+  "indicators": {},
+  "patterns": [
+    "Falling channel",
+    "Bearish MA alignment (20<50<100<200)",
+    "Potential double bottom near \u20b93000",
+    "Lower Bollinger-band tag/oversold"
+  ],
+  "strategy_signals": [
+    "Buy the dip near \u20b93000 only on bullish reversal candle/volume; trail below \u20b92950",
+    "Breakout add-on above \u20b93245 (close) aiming for \u20b93339",
+    "Alternative: Momentum short on breakdown below \u20b92990 toward \u20b92880-\u20b92850"
+  ],
+  "position_sizing": "3-5% of portfolio, risk per trade \u22641% of capital"
+}

@@ -1,0 +1,31 @@
+{
+  "trend": "Sideways",
+  "support_levels": [
+    1980.0,
+    1935.0,
+    1900.0
+  ],
+  "resistance_levels": [
+    2050.0,
+    2155.0,
+    2190.0
+  ],
+  "entry_range": "\u20b91950-\u20b91985",
+  "short_term_target": "\u20b92050",
+  "medium_term_target": "\u20b92155",
+  "stop_loss": "\u20b91910",
+  "confidence_score": "Medium",
+  "indicators": {},
+  "patterns": [
+    "Pullback to 200-DMA support",
+    "Double top near \u20b92185-\u20b92200",
+    "Bollinger lower-band touch/mean reversion",
+    "MA20 < MA50 (short-term bearish crossover)"
+  ],
+  "strategy_signals": [
+    "Accumulate near \u20b91950-\u20b91985 with stop \u20b91910",
+    "Add on close above \u20b92060 for momentum toward \u20b92155",
+    "Trail stop to \u20b91985 after breakout; avoid longs on close below \u20b91935"
+  ],
+  "position_sizing": "3-5% of portfolio"
+}

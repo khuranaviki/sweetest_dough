@@ -1,0 +1,137 @@
+
+====================================================================================================
+COMPREHENSIVE STOCK ANALYSIS REPORT
+====================================================================================================
+
+📊 STOCK INFORMATION
+==================================================
+Ticker: TCS.NS
+Company: TCS
+Sector: General
+Category: Enhanced Analysis
+Analysis Date: 2025-08-12 17:02:37
+
+====================================================================================================
+📈 TECHNICAL ANALYSIS
+==================================================
+Trend: Bearish
+Support Levels: [2990.0, 2850.0]
+Resistance Levels: [3150.0, 3245.0]
+Entry Range: ₹3000-₹3060
+Short-term Target: ₹3245
+Medium-term Target: ₹3339
+Stop Loss: ₹2950
+Confidence Score: Medium
+
+Technical Indicators:
+Not Available
+
+Chart Patterns Identified:
+  • Falling channel
+  • Bearish MA alignment (20<50<100<200)
+  • Potential double bottom near ₹3000
+  • Lower Bollinger-band tag/oversold
+
+Strategy Signals:
+  • Buy the dip near ₹3000 only on bullish reversal candle/volume; trail below ₹2950
+  • Breakout add-on above ₹3245 (close) aiming for ₹3339
+  • Alternative: Momentum short on breakdown below ₹2990 toward ₹2880-₹2850
+
+====================================================================================================
+💰 FUNDAMENTAL ANALYSIS
+==================================================
+Business Quality: Medium
+Market Penetration: Strong
+Pricing Power: High
+Revenue Growth: NA
+Profit Growth: NA
+Debt to Equity: 1.68
+ROCE/ROE: ROCE: 64.6 %, ROE: 52.4 %
+Promoter Pledging: 71.77%
+Retail Shareholding: 4.77%
+Valuation Status: Fair
+Fair Value: ₹ 3,036
+Financial Health: Average
+Multibagger Potential: Moderate
+Confidence Score: Medium
+
+Fundamental Reasons for Buy Signal:
+Growth Analysis: Average growth quality (Score: 0/100).
+        
+Growth Highlights:
+
+
+Financial Metrics: Market Cap ₹ 10,98,433 Cr., ROCE 64.6 %, ROE 52.4 %, Revenue Growth NA, Profit Growth NA
+
+Growth Metrics Detail:
+• Revenue YoY: N/A
+• Net Profit YoY: N/A
+• Operating Profit YoY: N/A
+• Revenue 3Y Avg: N/A
+• Profit 3Y Avg: N/A
+
+====================================================================================================
+📊 STRATEGY PERFORMANCE ANALYSIS
+==================================================
+Strategy Performance Analysis: Not applicable for Enhanced Analysis category stocks. Only V40 and V40 Next categories are eligible for strategy analysis.
+
+====================================================================================================
+🎯 FINAL RECOMMENDATION
+==================================================
+Action: HOLD
+Entry Price: ₹3000-₹3060
+Target Price: ₹3339
+Stop Loss: ₹2950
+Time Horizon: 3-6 months
+Confidence Level: Low (Basic Analysis)
+Risk Level: Medium
+Position Size: 1-2% of portfolio
+Strategy Used: Basic Analysis (Category: Enhanced Analysis)
+
+Key Risks:
+  • Market volatility
+  • Sector-specific risks
+  • Strategy performance may not repeat
+
+Fundamental Reasons for Buy Signal:
+Growth Analysis: Average growth quality (Score: 0/100).
+        
+Growth Highlights:
+
+
+Financial Metrics: Market Cap ₹ 10,98,433 Cr., ROCE 64.6 %, ROE 52.4 %, Revenue Growth NA, Profit Growth NA
+
+Growth Metrics Detail:
+• Revenue YoY: N/A
+• Net Profit YoY: N/A
+• Operating Profit YoY: N/A
+• Revenue 3Y Avg: N/A
+• Profit 3Y Avg: N/A
+
+====================================================================================================
+📈 ARTHALENS CORRELATED INSIGHTS
+==================================================
+
+🧠 COMPREHENSIVE CORRELATED INSIGHTS:
+
+
+📊 CORRELATION SUMMARY:
+- Data Sources: ['Fundamental Analysis', 'ArthaLens Transcripts']
+- Quarters Analyzed: []
+- Generated At: 2025-08-12T17:02:37.204288
+
+====================================================================================================
+📊 ANALYSIS SUMMARY
+==================================================
+This comprehensive analysis combines:
+✅ Technical Analysis with advanced pattern recognition
+✅ Fundamental Analysis with Screener.in data extraction
+✅ Strategy Performance Analysis with historical backtesting
+✅ ArthaLens Transcript & Guidance Analysis
+✅ Correlated Insights between fundamental and management commentary
+✅ Growth Confidence and Valuation Assessment
+✅ Fundamental Metrics Correlation Analysis
+✅ Projected Growth Analysis
+
+The analysis provides a holistic view of TCS.NS considering both quantitative metrics and qualitative management insights.
+====================================================================================================
